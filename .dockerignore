@@ -1,0 +1,22 @@
+.git
+.worktrees
+.DS_Store
+
+# Python
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+
+# Node/NestJS
+**/node_modules
+**/dist
+apps/backend/storage
+
+# Flutter/Dart
+**/.dart_tool
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build

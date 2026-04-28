@@ -15,7 +15,8 @@
 - NestJS server: `pick-photo/apps/backend/` is a private npm project using NestJS; source entrypoint is `pick-photo/apps/backend/src/main.ts`; photo API files live in `pick-photo/apps/backend/src/photos/`; AI adapter lives in `pick-photo/apps/backend/src/ai/`; local CORS is enabled; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
 - Backend storage and adapter behavior: uploaded files are stored through `LocalPhotoStorage`, defaulting to `pick-photo/apps/backend/storage/` when run from `pick-photo/apps/backend`; `PHOTO_STORAGE_DIR` overrides that path; `AI_SERVICE_BASE_URL` enables the Python AI HTTP adapter and absence of that env var falls back to deterministic fake AI; `DATABASE_URL` enables the PostgreSQL repository using `pg` and absence of that env var falls back to the in-memory repository.
 - Python AI server: `pick-photo/apps/ai/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `pick-photo/apps/ai/app/main.py`; deterministic fake AI behavior lives in `pick-photo/apps/ai/app/fake_ai.py`.
-- Database assets: `pick-photo/database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `pick-photo/database/seeds/README.md` reserves the seed workflow. Backend repository code can write workflow metadata to PostgreSQL when `DATABASE_URL` is configured, but no migration runner or local PostgreSQL server command is verified yet.
+- Database assets: `pick-photo/database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `pick-photo/database/seeds/README.md` reserves the seed workflow. Backend repository code can write workflow metadata to PostgreSQL when `DATABASE_URL` is configured. Docker Compose verifies local PostgreSQL startup with the initial schema, but no repeatable migration runner for non-empty databases is selected yet.
+- Docker local runtime: `pick-photo/docker-compose.yml` runs PostgreSQL, the Python AI server, and the NestJS backend together. The Compose stack mounts `pick-photo/database/migrations/001_initial_schema.sql` into PostgreSQL init, shares a named storage volume between backend and AI at `/data/storage`, exposes backend `3000`, AI `8000`, and PostgreSQL `5432`, and leaves Flutter to run locally against `http://localhost:3000`.
 - Languages and runtimes:
   - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `apps/mobile/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
   - Node.js v22.20.0 and npm 10.9.3 are verified locally; `apps/backend/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
@@ -27,6 +28,11 @@
   - `cd apps/backend && npm run build`
   - `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`
   - `cd apps/mobile && mise x flutter@3.22.1-stable -- dart format lib test`
+  - `docker compose config`
+  - `docker compose build`
+  - `docker compose up -d`
+  - `docker compose ps`
+  - `docker compose exec -T postgres psql -U pick_photo -d pick_photo -c "select count(*) as tables from information_schema.tables where table_schema = 'public';"`
 
 ## Product Reference
 
@@ -43,8 +49,8 @@
 - Decision needed: infrastructure folder shape, deployment target, environment variable policy, secrets management, observability, and operations commands.
 - Decision needed: authentication policy, real upload storage, real job orchestration, production data retention policy, and production error model.
 - Decision needed: Python AI model stack, production face detection/selection pipeline, production ID-photo generation pipeline, model artifact storage, and inference hardware expectations.
-- Decision needed: PostgreSQL migration runner, production transaction policy, seed/fixture workflow, and local PostgreSQL validation command.
-- Decision needed: local development commands beyond the verified validation commands, lint coverage policy, Docker, deployment, observability, and operations commands.
+- Decision needed: PostgreSQL migration runner for non-empty databases, production transaction policy, and seed/fixture workflow.
+- Decision needed: local development commands beyond the verified validation commands, lint coverage policy, deployment, observability, and operations commands.
 - Decision needed: privacy, consent, personal data handling, image retention, deletion, logging redaction, and compliance requirements for uploaded photos and generated ID photos.
 
 ## Always-On Rules

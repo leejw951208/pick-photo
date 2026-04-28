@@ -106,7 +106,7 @@ Testing should grow from the contract boundaries:
 - Database: migration checks and data integrity tests around workflow records and status transitions.
 - Integration: a minimal end-to-end happy path with fake AI responses, then a local-storage-aligned path using the Python AI service.
 
-Verified validation commands are now recorded in `AGENTS.md` for the Python AI server, NestJS backend, and Flutter app. Local PostgreSQL migration validation remains unverified until the migration runner or local PostgreSQL command is selected.
+Verified validation commands are now recorded in `AGENTS.md` for the Python AI server, NestJS backend, Flutter app, and Docker Compose local runtime. Docker Compose validates first-time PostgreSQL schema initialization, while a repeatable migration runner for non-empty databases remains undecided.
 
 ## Implementation Order
 
@@ -116,9 +116,10 @@ Verified validation commands are now recorded in `AGENTS.md` for the Python AI s
 4. Completed: scaffold the NestJS server and connect it to the fake AI service contract.
 5. Completed: scaffold the Flutter app and build the user flow against the NestJS API contract.
 6. Completed: replace the Python AI server default with local OpenCV/Pillow image processing behind the same service contract while keeping explicit fake mode.
-7. Next: provide result image serving/download behavior.
-8. Next: add mobile result preview/save UX.
-9. Next: add privacy, retention, cleanup, and operational documentation.
+7. Completed: add a Docker Compose local runtime for PostgreSQL, Python AI, and NestJS with shared storage.
+8. Next: provide result image serving/download behavior.
+9. Next: add mobile result preview/save UX.
+10. Next: add privacy, retention, cleanup, and operational documentation.
 
 ## Resolved Decisions
 
@@ -126,6 +127,7 @@ Verified validation commands are now recorded in `AGENTS.md` for the Python AI s
 - The first vertical slice used deterministic fake AI behavior so the Flutter app, NestJS backend, and Python AI service could integrate before model selection was final.
 - The NestJS backend stores uploaded files through local storage by default, uses PostgreSQL when `DATABASE_URL` is set, and falls back to in-memory workflow storage when `DATABASE_URL` is absent.
 - The Python AI server now uses local OpenCV/Pillow processing by default and preserves deterministic fake behavior with `PICK_PHOTO_AI_MODE=fake`.
+- Local Docker Compose runs PostgreSQL, Python AI, and NestJS backend together. Flutter remains a local client pointed at `http://localhost:3000`.
 
 ## Open Decisions
 
@@ -136,7 +138,7 @@ Verified validation commands are now recorded in `AGENTS.md` for the Python AI s
 - Exact ID-photo output standards.
 - Whether outputs must satisfy country-specific ID-photo rules.
 - Production AI model stack, model artifacts, and inference hardware expectations.
-- Deployment and operations model.
+- Production deployment and operations model.
 
 ## Spec Self-Review
 
