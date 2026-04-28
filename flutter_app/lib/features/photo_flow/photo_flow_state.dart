@@ -37,6 +37,7 @@ class PhotoFlowState {
     required List<DetectedFace> faces,
     required Set<String> selectedFaceIds,
     required List<GeneratedPhoto> results,
+    this.uploadId,
     this.message,
   })  : faces = List.unmodifiable(faces),
         selectedFaceIds = Set.unmodifiable(selectedFaceIds),
@@ -47,9 +48,11 @@ class PhotoFlowState {
         faces = const [],
         selectedFaceIds = const {},
         results = const [],
+        uploadId = null,
         message = null;
 
   final PhotoFlowStage stage;
+  final String? uploadId;
   final List<DetectedFace> faces;
   final Set<String> selectedFaceIds;
   final List<GeneratedPhoto> results;
@@ -60,7 +63,9 @@ class PhotoFlowState {
     List<DetectedFace>? faces,
     Set<String>? selectedFaceIds,
     List<GeneratedPhoto>? results,
+    String? uploadId,
     String? message,
+    bool clearUploadId = false,
     bool clearMessage = false,
   }) {
     return PhotoFlowState(
@@ -68,6 +73,7 @@ class PhotoFlowState {
       faces: faces ?? this.faces,
       selectedFaceIds: selectedFaceIds ?? this.selectedFaceIds,
       results: results ?? this.results,
+      uploadId: clearUploadId ? null : uploadId ?? this.uploadId,
       message: clearMessage ? null : message ?? this.message,
     );
   }

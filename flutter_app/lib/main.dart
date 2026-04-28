@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'features/photo_flow/photo_flow_api.dart';
 import 'features/photo_flow/photo_flow_screen.dart';
+import 'features/photo_flow/photo_picker.dart';
 
 void main() {
   runApp(const PickPhotoApp());
@@ -15,7 +16,10 @@ class PickPhotoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pick Photo',
       theme: ThemeData(useMaterial3: true),
-      home: PhotoFlowScreen(api: FakePhotoFlowApi()),
+      home: PhotoFlowScreen(
+        api: NestPhotoFlowApi(),
+        photoPicker: FilePickerPhotoPicker(),
+      ),
     );
   }
 }

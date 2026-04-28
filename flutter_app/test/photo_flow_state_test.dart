@@ -9,6 +9,7 @@ void main() {
     expect(state.faces, isEmpty);
     expect(state.selectedFaceIds, isEmpty);
     expect(state.results, isEmpty);
+    expect(state.uploadId, isNull);
     expect(state.message, isNull);
   });
 
@@ -31,6 +32,16 @@ void main() {
     final clearedState = state.copyWith(clearMessage: true);
 
     expect(clearedState.message, isNull);
+  });
+
+  test('copyWith can clear an upload id', () {
+    final state = const PhotoFlowState.initial().copyWith(
+      uploadId: 'upload-1',
+    );
+
+    final clearedState = state.copyWith(clearUploadId: true);
+
+    expect(clearedState.uploadId, isNull);
   });
 
   test('state collections cannot be mutated from outside', () {

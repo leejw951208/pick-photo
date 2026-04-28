@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'photo_flow_api.dart';
+import 'photo_picker.dart';
 import 'photo_flow_state.dart';
 
 class PhotoFlowScreen extends StatefulWidget {
-  const PhotoFlowScreen({super.key, required this.api});
+  const PhotoFlowScreen({
+    super.key,
+    required this.api,
+    required this.photoPicker,
+  });
 
   final PhotoFlowApi api;
+  final PhotoPicker photoPicker;
 
   @override
   State<PhotoFlowScreen> createState() => _PhotoFlowScreenState();
@@ -15,20 +21,30 @@ class PhotoFlowScreen extends StatefulWidget {
 class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   PhotoFlowState state = const PhotoFlowState.initial();
 
-  Future<void> _simulateUpload(String path) async {
+  Future<void> _pickAndUploadPhoto() async {
+    final photo = await widget.photoPicker.pickPhoto();
+    if (!mounted || photo == null) {
+      return;
+    }
+
+    await _uploadPhoto(photo);
+  }
+
+  Future<void> _uploadPhoto(LocalPhotoFile photo) async {
     setState(() {
       state = state.copyWith(
         stage: PhotoFlowStage.uploading,
         faces: const [],
         selectedFaceIds: const {},
         results: const [],
+        clearUploadId: true,
         message: 'Uploading photo',
       );
     });
 
-    final List<DetectedFace> faces;
+    final FaceDetectionResult detectionResult;
     try {
-      faces = await widget.api.uploadAndDetectFaces(path);
+      detectionResult = await widget.api.uploadAndDetectFaces(photo);
     } catch (_) {
       if (!mounted) {
         return;
@@ -40,6 +56,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
           faces: const [],
           selectedFaceIds: const {},
           results: const [],
+          clearUploadId: true,
           message: 'Upload failed. Try again',
         );
       });
@@ -51,25 +68,39 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
     }
 
     setState(() {
-      state = faces.isEmpty
+      state = detectionResult.faces.isEmpty
           ? state.copyWith(
               stage: PhotoFlowStage.failed,
-              faces: faces,
+              faces: detectionResult.faces,
               selectedFaceIds: const {},
               results: const [],
+              uploadId: detectionResult.uploadId,
               message: 'No face found',
             )
           : state.copyWith(
               stage: PhotoFlowStage.reviewingFaces,
-              faces: faces,
+              faces: detectionResult.faces,
               selectedFaceIds: const {},
               results: const [],
+              uploadId: detectionResult.uploadId,
               message: 'Choose a face',
             );
     });
   }
 
   Future<void> _generate(Set<String> faceIds) async {
+    final uploadId = state.uploadId;
+    if (uploadId == null) {
+      setState(() {
+        state = state.copyWith(
+          stage: PhotoFlowStage.failed,
+          results: const [],
+          message: 'Upload a photo before generating',
+        );
+      });
+      return;
+    }
+
     setState(() {
       state = state.copyWith(
         stage: PhotoFlowStage.generating,
@@ -81,7 +112,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
 
     final List<GeneratedPhoto> results;
     try {
-      results = await widget.api.generateForFaces(faceIds);
+      results = await widget.api.generateForFaces(uploadId, faceIds);
     } catch (_) {
       if (!mounted) {
         return;
@@ -122,12 +153,8 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
             Text(state.message ?? 'Upload a photo to begin'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => _simulateUpload('person.jpg'),
-              child: const Text('Upload sample photo'),
-            ),
-            ElevatedButton(
-              onPressed: () => _simulateUpload('no-face.jpg'),
-              child: const Text('Upload no-face sample'),
+              onPressed: _pickAndUploadPhoto,
+              child: const Text('Upload photo'),
             ),
             const SizedBox(height: 16),
             for (final face in state.faces)
