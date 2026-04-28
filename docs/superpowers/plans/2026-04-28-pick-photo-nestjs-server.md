@@ -32,7 +32,7 @@
 **Files:**
 - Create: `apps/backend/`
 
-- [ ] **Step 1: Generate project**
+- [x] **Step 1: Generate project**
 
 Run after Node.js tooling is available:
 
@@ -42,7 +42,7 @@ npx @nestjs/cli new apps/backend --package-manager npm --skip-git
 
 Expected: NestJS project files are created under `apps/backend/`.
 
-- [ ] **Step 2: Run generated tests**
+- [x] **Step 2: Run generated tests**
 
 Run:
 
@@ -58,7 +58,7 @@ Expected: generated tests pass.
 **Files:**
 - Create: `apps/backend/src/photos/dto.ts`
 
-- [ ] **Step 1: Create DTO definitions**
+- [x] **Step 1: Create DTO definitions**
 
 ```typescript
 export type WorkflowStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'deleted';
@@ -122,7 +122,7 @@ export interface GenerationStatusResponseDto {
 **Files:**
 - Create: `apps/backend/src/ai/ai-client.ts`
 
-- [ ] **Step 1: Create adapter interface and fake implementation**
+- [x] **Step 1: Create adapter interface and fake implementation**
 
 ```typescript
 import { DetectedFaceDto, FaceBoxDto } from '../photos/dto';
@@ -174,7 +174,7 @@ export class FakeAiClient implements AiClient {
 **Files:**
 - Create: `apps/backend/src/photos/photos.service.ts`
 
-- [ ] **Step 1: Create service with deterministic in-memory state**
+- [x] **Step 1: Create service with deterministic in-memory state**
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -259,7 +259,7 @@ export class PhotosService {
 - Create: `apps/backend/src/photos/photos.module.ts`
 - Modify: `apps/backend/src/app.module.ts`
 
-- [ ] **Step 1: Create controller**
+- [x] **Step 1: Create controller**
 
 ```typescript
 import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
@@ -294,7 +294,7 @@ export class PhotosController {
 }
 ```
 
-- [ ] **Step 2: Create module**
+- [x] **Step 2: Create module**
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -308,7 +308,7 @@ import { PhotosService } from './photos.service';
 export class PhotosModule {}
 ```
 
-- [ ] **Step 3: Register module in `app.module.ts`**
+- [x] **Step 3: Register module in `app.module.ts`**
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -325,7 +325,7 @@ export class AppModule {}
 **Files:**
 - Test: `apps/backend/test/photos.e2e-spec.ts`
 
-- [ ] **Step 1: Add e2e contract test**
+- [x] **Step 1: Add e2e contract test**
 
 ```typescript
 import { INestApplication } from '@nestjs/common';
@@ -374,7 +374,7 @@ describe('Photos workflow', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests**
+- [x] **Step 2: Run tests**
 
 Run:
 

@@ -21,6 +21,7 @@ Then provide manual validation steps based on the changed behavior.
 ## Before Reporting Completion
 
 - Confirm implementation review is complete.
+- Confirm every completed in-scope feature has an automated validation command, test name, or explicit manual validation step recorded.
 - Report commands run and results.
 - Report commands not run and why.
 - Include manual checks for behavior that automated tests do not cover.

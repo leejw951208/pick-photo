@@ -13,15 +13,16 @@
 
 **Architecture:** Keep the Flutter app, NestJS server, Python AI server, and PostgreSQL assets in independent folders. Cross-project behavior is coordinated through documented contracts in `docs/contracts` rather than shared code.
 
-**Tech Stack:** Flutter, NestJS, Python AI service, PostgreSQL. Exact versions and package managers must be selected during the first implementation task and then recorded in `AGENTS.md`.
+**Tech Stack:** Flutter 3.22.1 / Dart 3.4.1, NestJS 11 with npm, Python 3.12 / FastAPI, and PostgreSQL SQL migrations. Verified versions and validation commands are recorded in `AGENTS.md`.
 
 ---
 
 ## Plan Notes
 
-- Current repository state: no source projects exist yet.
-- Verified validation commands: No verified test command found.
-- Commit steps are blocked until this directory is initialized as a Git repository or connected to an existing repository.
+- Current repository state: contract documents, database assets, Flutter app, NestJS server, and Python AI server exist.
+- Verified validation commands are recorded in `AGENTS.md`.
+- Git is initialized and connected to `https://github.com/leejw951208/pick-photo.git` on `main`.
+- The first foundation pass is complete. Remaining work is real model-backed AI behavior, result image serving/download, retention/deletion execution, operations documentation, and local PostgreSQL migration validation.
 - Execute subsystem plans in this order unless a blocker appears:
   1. `docs/superpowers/plans/2026-04-28-pick-photo-database.md`
   2. `docs/superpowers/plans/2026-04-28-pick-photo-python-ai-server.md`
@@ -30,15 +31,15 @@
 
 ## File Structure
 
-- Create: `docs/contracts/api.md` for Flutter-to-NestJS contracts.
-- Create: `docs/contracts/ai-service.md` for NestJS-to-Python AI contracts.
-- Create: `docs/contracts/data-model.md` for entity and status definitions.
-- Create: `docs/contracts/privacy.md` for sensitive photo handling rules.
-- Create: `apps/mobile/` through the Flutter plan.
-- Create: `apps/backend/` through the NestJS plan.
-- Create: `apps/ai/` through the Python AI plan.
-- Create: `database/` through the database plan.
-- Modify: `AGENTS.md` after each project exists to record verified commands and decisions.
+- Exists: `docs/contracts/api.md` for Flutter-to-NestJS contracts.
+- Exists: `docs/contracts/ai-service.md` for NestJS-to-Python AI contracts.
+- Exists: `docs/contracts/data-model.md` for entity and status definitions.
+- Exists: `docs/contracts/privacy.md` for sensitive photo handling rules.
+- Exists: `apps/mobile/` through the Flutter plan.
+- Exists: `apps/backend/` through the NestJS plan.
+- Exists: `apps/ai/` through the Python AI plan.
+- Exists: `database/` through the database plan.
+- Updated: `AGENTS.md` records verified commands, app shape, adapters, and remaining decisions.
 
 ### Task 1: Create Contract Document Skeletons
 
@@ -48,7 +49,7 @@
 - Create: `docs/contracts/data-model.md`
 - Create: `docs/contracts/privacy.md`
 
-- [ ] **Step 1: Create `docs/contracts/api.md`**
+- [x] **Step 1: Create `docs/contracts/api.md`**
 
 ```markdown
 # Application API Contract
@@ -66,7 +67,7 @@ Defines the contract between the Flutter app and the NestJS server.
 - `generation_failed`
 - `result_unavailable`
 
-## Endpoints To Implement
+## Implemented Endpoints
 
 - `POST /photos/uploads`: upload a user photo.
 - `GET /photos/uploads/:uploadId/faces`: fetch detected faces for an upload.
@@ -74,7 +75,7 @@ Defines the contract between the Flutter app and the NestJS server.
 - `GET /photos/generations/:generationId`: fetch generation status and results.
 ```
 
-- [ ] **Step 2: Create `docs/contracts/ai-service.md`**
+- [x] **Step 2: Create `docs/contracts/ai-service.md`**
 
 ```markdown
 # AI Service Contract
@@ -95,7 +96,7 @@ Defines the internal contract between the NestJS server and the Python AI server
 - `generation_failed`
 ```
 
-- [ ] **Step 3: Create `docs/contracts/data-model.md`**
+- [x] **Step 3: Create `docs/contracts/data-model.md`**
 
 ```markdown
 # Data Model Contract
@@ -116,7 +117,7 @@ Defines the internal contract between the NestJS server and the Python AI server
 - `deleted`
 ```
 
-- [ ] **Step 4: Create `docs/contracts/privacy.md`**
+- [x] **Step 4: Create `docs/contracts/privacy.md`**
 
 ```markdown
 # Privacy Contract
@@ -138,7 +139,7 @@ Defines the internal contract between the NestJS server and the Python AI server
 - Delete temporary processing files after each workflow step completes or fails.
 ```
 
-- [ ] **Step 5: Validate contract docs exist**
+- [x] **Step 5: Validate contract docs exist**
 
 Run:
 
@@ -163,19 +164,19 @@ docs/contracts/privacy.md
 - Read: `docs/superpowers/plans/2026-04-28-pick-photo-nestjs-server.md`
 - Read: `docs/superpowers/plans/2026-04-28-pick-photo-flutter-app.md`
 
-- [ ] **Step 1: Execute the database plan**
+- [x] **Step 1: Execute the database plan**
 
 Start with `docs/superpowers/plans/2026-04-28-pick-photo-database.md` so entity names and statuses are stable before services are scaffolded.
 
-- [ ] **Step 2: Execute the Python AI server plan**
+- [x] **Step 2: Execute the Python AI server plan**
 
 Use deterministic fake AI behavior first so the API and app can be integrated before model selection is final.
 
-- [ ] **Step 3: Execute the NestJS server plan**
+- [x] **Step 3: Execute the NestJS server plan**
 
 Implement the public application API and connect it to the Python AI service contract.
 
-- [ ] **Step 4: Execute the Flutter app plan**
+- [x] **Step 4: Execute the Flutter app plan**
 
 Build the user flow against the NestJS server contract.
 
@@ -184,7 +185,7 @@ Build the user flow against the NestJS server contract.
 **Files:**
 - Modify: `AGENTS.md`
 
-- [ ] **Step 1: Replace unresolved technical decisions with verified repository facts**
+- [x] **Step 1: Replace unresolved technical decisions with verified repository facts**
 
 After each project creates metadata and validation commands, update `AGENTS.md` sections:
 
@@ -195,12 +196,12 @@ After each project creates metadata and validation commands, update `AGENTS.md` 
   - <command from project metadata>
 ```
 
-- [ ] **Step 2: Confirm no unresolved command is listed as verified**
+- [x] **Step 2: Confirm no unresolved command is listed as verified**
 
 Run:
 
 ```bash
-rg -n "No verified test command found|Decision needed|Verified validation commands" AGENTS.md
+rg -n "Decision needed|Verified validation commands" AGENTS.md
 ```
 
 Expected: unresolved commands remain under decisions only; commands listed as verified exist in project metadata.
@@ -210,4 +211,4 @@ Expected: unresolved commands remain under decisions only; commands listed as ve
 - Spec coverage: covers root structure, contracts, subsystem ordering, and harness updates.
 - Placeholder scan: no unfinished placeholder markers are present.
 - Type consistency: entity names and status names match the system design.
-- Residual risk: exact runtime versions remain unresolved until project scaffolding begins.
+- Residual risk: production AI model behavior, result image serving/download, retention/deletion execution, operations documentation, and local PostgreSQL migration validation remain unresolved.

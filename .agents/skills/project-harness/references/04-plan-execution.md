@@ -5,6 +5,7 @@ Implement only after plan review is `Approved` and the user has confirmed the ap
 ## Execution Rules
 
 - Follow the approved scope.
+- Keep feature progress tracking current when `08-feature-progress.md` applies.
 - Keep changes small and reviewable.
 - Preserve existing language, runtime, module, source layout, routing, services, domain logic, validation, errors, logging, tests, and documentation patterns.
 - Keep product behavior aligned with existing `PRD.md` when present.
@@ -12,6 +13,7 @@ Implement only after plan review is `Approved` and the user has confirmed the ap
 - Do not add dependencies unless the approved plan explains why existing code cannot reasonably solve the problem.
 - Do not introduce new languages, runtimes, frameworks, package managers, build tools, test runners, clouds, databases, or external services unless the user explicitly requested them and the plan records the impact.
 - If implementation must materially diverge from the approved plan, stop and update the plan before continuing.
+- If a feature becomes blocked, mark it `Blocked`, record the blocker and next action, and do not silently continue around it.
 - Write human-facing change summaries and commit messages in Korean.
 - Format commit messages as `<commit type>: <Korean message>` on `main` or `dev`; use `[<branch>]<commit type>: <Korean message>` on any other branch.
 

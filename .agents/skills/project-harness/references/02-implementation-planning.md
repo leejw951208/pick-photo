@@ -19,6 +19,7 @@ Include:
 - Existing PRD requirements or open decisions involved, if any
 - Files or modules likely to change
 - Product behavior, API, CLI, configuration, data, type/interface, package metadata, or schema impacts
+- Feature progress tracking when the work has distinct features, requirements, user flows, API/CLI behaviors, or multi-step deliverables
 - Security-sensitive impacts and required `security.md` checks
 - Language/runtime impacts and required `language-runtime.md` checks
 - Test and validation commands verified from repository files
@@ -27,4 +28,4 @@ Include:
 
 ## Output
 
-Write a concise implementation plan that can be reviewed before code changes.
+Write a concise implementation plan that can be reviewed before code changes. When feature progress tracking applies, include a `Feature Progress` section using `08-feature-progress.md`.

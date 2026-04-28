@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+## 진행 현황 (2026-04-28)
+
+- 완료: database 폴더 문서, seed 정책 문서, PostgreSQL 초기 스키마, 데이터 모델 계약 문서 정렬.
+- 남은 작업: 마이그레이션 러너 선택, 로컬 PostgreSQL SQL 검증 명령 확정, 운영/트랜잭션/fixture 정책 구체화.
+
 **Goal:** Create the PostgreSQL data foundation for uploads, detected faces, generation jobs, generated photos, and lifecycle states.
 
 **Architecture:** Keep database assets in an independent `database/` folder with SQL migrations and schema documentation. Store metadata and file references in PostgreSQL; do not store raw image bytes in relational tables.
@@ -23,7 +28,7 @@
 - Create: `database/README.md`
 - Create: `database/seeds/README.md`
 
-- [ ] **Step 1: Create `database/README.md`**
+- [x] **Step 1: Create `database/README.md`**
 
 ```markdown
 # Pick Photo Database
@@ -47,7 +52,7 @@ PostgreSQL stores workflow metadata and file references. Raw source photos, dete
 - `deleted`
 ```
 
-- [ ] **Step 2: Create `database/seeds/README.md`**
+- [x] **Step 2: Create `database/seeds/README.md`**
 
 ```markdown
 # Database Seeds
@@ -62,7 +67,7 @@ Add deterministic seed data only when it supports local development, contract te
 **Files:**
 - Create: `database/migrations/001_initial_schema.sql`
 
-- [ ] **Step 1: Write the initial schema**
+- [x] **Step 1: Write the initial schema**
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -151,7 +156,7 @@ No verified command exists yet. Once PostgreSQL local tooling is selected, run t
 **Files:**
 - Modify: `docs/contracts/data-model.md`
 
-- [ ] **Step 1: Replace the entity list with schema-backed names**
+- [x] **Step 1: Replace the entity list with schema-backed names**
 
 ```markdown
 # Data Model Contract

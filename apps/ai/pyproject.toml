@@ -5,6 +5,8 @@ description = "Internal AI service for Pick Photo face detection and ID-photo ge
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.110",
+  "opencv-python-headless>=4.9",
+  "Pillow>=10.0",
   "pydantic>=2.0",
   "uvicorn[standard]>=0.27",
 ]

@@ -5,6 +5,7 @@ Review the completed implementation before declaring it ready or tested.
 ## Review Checklist
 
 - The implementation matches the approved plan and confirmed scope.
+- Feature progress tracking is current when applicable, including status, progress, blockers, and feature-requirement-test mapping.
 - Any plan divergence was recorded and approved through an updated plan.
 - The change is limited to the requested scope.
 - The implementation remains aligned with existing `PRD.md` when present.
@@ -33,4 +34,4 @@ Apply only checks that match verified repository evidence:
 
 ## Output
 
-Record findings, fixes applied, and residual risks before testing.
+Record findings, fixes applied, feature progress updates, and residual risks before testing.

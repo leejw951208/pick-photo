@@ -19,7 +19,7 @@ Check whether repo-local docs need updates when the change affects:
 ## Rules
 
 - Write `AGENTS.md` and `.agents/**` operational guidance in English.
-- Write human-facing documents outside `.agents/` in Korean, including PRDs, product docs, feature docs, implementation plans, review docs, change summaries, and commit messages.
+- Write human-facing documents outside `.agents/` in Korean, including PRDs, feature docs, implementation plans, review docs, change summaries, and commit messages.
 - Format commit messages as `<commit type>: <Korean message>` on `main` or `dev`; use `[<branch>]<commit type>: <Korean message>` on any other branch.
 - During harness generation, do not create, modify, overwrite, rewrite, or delete `PRD.md`.
 - For future separate PRD tasks, write `PRD.md` in Korean.

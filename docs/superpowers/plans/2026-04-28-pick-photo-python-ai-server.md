@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+## 진행 현황 (2026-04-28)
+
+- 완료: Python 프로젝트 메타데이터, FastAPI 엔드포인트, Pydantic 계약 스키마, deterministic fake 얼굴 인식/증명사진 생성 동작, AI 계약 테스트.
+- 남은 작업: 실제 모델 기반 얼굴 인식/증명사진 생성 파이프라인, 모델 산출물 저장 위치, 임시 파일 정리 정책의 실제 실행.
+
 **Goal:** Build an internal Python AI service contract for face detection and ID-photo generation, starting with deterministic fake behavior before real model integration.
 
 **Architecture:** Keep the AI service isolated in `apps/ai/`. The first vertical slice returns deterministic responses so the NestJS server and Flutter app can integrate without waiting for model selection.
@@ -24,7 +29,7 @@
 **Files:**
 - Create: `apps/ai/pyproject.toml`
 
-- [ ] **Step 1: Create Python project metadata**
+- [x] **Step 1: Create Python project metadata**
 
 ```toml
 [project]
@@ -49,7 +54,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 ```
 
-- [ ] **Step 2: Install dependencies in the implementation environment**
+- [x] **Step 2: Install dependencies in the implementation environment**
 
 Run after Python tooling is available:
 
@@ -66,7 +71,7 @@ Expected: packages install without errors.
 - Create: `apps/ai/app/schemas.py`
 - Test: `apps/ai/tests/test_ai_contract.py`
 
-- [ ] **Step 1: Write schema tests**
+- [x] **Step 1: Write schema tests**
 
 ```python
 from app.schemas import DetectFacesRequest, GenerateIdPhotoRequest
@@ -91,7 +96,7 @@ def test_generate_id_photo_request_accepts_face_box():
     assert request.box.width == 100
 ```
 
-- [ ] **Step 2: Implement schemas**
+- [x] **Step 2: Implement schemas**
 
 ```python
 from pydantic import BaseModel, Field
@@ -137,7 +142,7 @@ class GenerateIdPhotoResponse(BaseModel):
     content_type: str
 ```
 
-- [ ] **Step 3: Run schema tests**
+- [x] **Step 3: Run schema tests**
 
 Run:
 
@@ -154,7 +159,7 @@ Expected: both tests pass after dependencies are installed.
 - Create: `apps/ai/app/fake_ai.py`
 - Modify: `apps/ai/tests/test_ai_contract.py`
 
-- [ ] **Step 1: Add fake AI tests**
+- [x] **Step 1: Add fake AI tests**
 
 ```python
 from app.fake_ai import detect_faces, generate_id_photo
@@ -188,7 +193,7 @@ def test_fake_generation_returns_result_reference():
     assert response.content_type == "image/jpeg"
 ```
 
-- [ ] **Step 2: Implement fake AI functions**
+- [x] **Step 2: Implement fake AI functions**
 
 ```python
 from app.schemas import (
@@ -234,7 +239,7 @@ def generate_id_photo(request: GenerateIdPhotoRequest) -> GenerateIdPhotoRespons
 **Files:**
 - Create: `apps/ai/app/main.py`
 
-- [ ] **Step 1: Implement FastAPI app**
+- [x] **Step 1: Implement FastAPI app**
 
 ```python
 from fastapi import FastAPI
@@ -261,7 +266,7 @@ def post_generate_id_photo(request: GenerateIdPhotoRequest) -> GenerateIdPhotoRe
     return generate_id_photo(request)
 ```
 
-- [ ] **Step 2: Run tests**
+- [x] **Step 2: Run tests**
 
 Run:
 
@@ -277,7 +282,7 @@ Expected: all Python AI tests pass.
 **Files:**
 - Modify: `docs/contracts/ai-service.md`
 
-- [ ] **Step 1: Document request and response fields**
+- [x] **Step 1: Document request and response fields**
 
 Add the schema field names from `apps/ai/app/schemas.py` under each operation in `docs/contracts/ai-service.md`.
 

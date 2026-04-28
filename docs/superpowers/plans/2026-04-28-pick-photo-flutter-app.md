@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+## 진행 현황 (2026-04-28)
+
+- 완료: Flutter 앱 scaffold, 사진 선택/업로드 API 경계, NestJS API 클라이언트, fake 클라이언트, 업로드/얼굴 검토/단일 또는 전체 얼굴 생성 요청/결과 목록 표시 흐름, 상태/API/위젯 테스트.
+- 남은 작업: 실제 결과 이미지 미리보기/저장 UX, 개인정보 동의와 보관/삭제 안내 UX, 모바일 화면 품질 보강, Android 빌드 검증.
+
 **Goal:** Build the first Flutter user flow for uploading a photo, reviewing detected faces, selecting one or all faces, generating ID-photo style results, and displaying outcomes.
 
 **Architecture:** Keep the app isolated in `apps/mobile/`. Use a small feature module for the photo workflow and call only the NestJS application API.
@@ -25,7 +30,7 @@
 **Files:**
 - Create: `apps/mobile/`
 
-- [ ] **Step 1: Generate project**
+- [x] **Step 1: Generate project**
 
 Run after Flutter tooling is available:
 
@@ -35,7 +40,7 @@ flutter create --org com.pickphoto --project-name pick_photo apps/mobile
 
 Expected: Flutter project files are created under `apps/mobile/`.
 
-- [ ] **Step 2: Run generated tests**
+- [x] **Step 2: Run generated tests**
 
 Run:
 
@@ -52,7 +57,7 @@ Expected: generated Flutter tests pass.
 - Create: `apps/mobile/lib/features/photo_flow/photo_flow_state.dart`
 - Test: `apps/mobile/test/photo_flow_state_test.dart`
 
-- [ ] **Step 1: Write state tests**
+- [x] **Step 1: Write state tests**
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -79,7 +84,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Implement state types**
+- [x] **Step 2: Implement state types**
 
 ```dart
 enum PhotoFlowStage {
@@ -160,7 +165,7 @@ class PhotoFlowState {
 **Files:**
 - Create: `apps/mobile/lib/features/photo_flow/photo_flow_api.dart`
 
-- [ ] **Step 1: Implement client interface and fake client**
+- [x] **Step 1: Implement client interface and fake client**
 
 ```dart
 import 'photo_flow_state.dart';
@@ -204,7 +209,7 @@ class FakePhotoFlowApi implements PhotoFlowApi {
 - Modify: `apps/mobile/lib/main.dart`
 - Test: `apps/mobile/test/photo_flow_screen_test.dart`
 
-- [ ] **Step 1: Implement screen**
+- [x] **Step 1: Implement screen**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -293,7 +298,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
 }
 ```
 
-- [ ] **Step 2: Register screen in `main.dart`**
+- [x] **Step 2: Register screen in `main.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -319,7 +324,7 @@ class PickPhotoApp extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 3: Add widget test**
+- [x] **Step 3: Add widget test**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -339,7 +344,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 4: Run Flutter tests**
+- [x] **Step 4: Run Flutter tests**
 
 Run:
 

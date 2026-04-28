@@ -106,28 +106,33 @@ Testing should grow from the contract boundaries:
 - Database: migration checks and data integrity tests around workflow records and status transitions.
 - Integration: a minimal end-to-end happy path with fake AI responses before real model inference is introduced.
 
-No repository-local test command is verified yet. Each project plan must add its own metadata and then record verified commands in `AGENTS.md`.
+Verified validation commands are now recorded in `AGENTS.md` for the Python AI server, NestJS backend, and Flutter app. Local PostgreSQL migration validation remains unverified until the migration runner or local PostgreSQL command is selected.
 
 ## Implementation Order
 
-1. Create contract docs and the root folder structure.
-2. Create the database schema plan and migration files.
-3. Scaffold the Python AI server with fake deterministic detection/generation responses.
-4. Scaffold the NestJS server and connect it to the fake AI service contract.
-5. Scaffold the Flutter app and build the user flow against the NestJS API contract.
-6. Replace fake AI behavior with real model-backed behavior behind the same Python AI service contract.
-7. Add privacy, retention, cleanup, and operational documentation.
+1. Completed: create contract docs and the root folder structure.
+2. Completed: create the database schema plan and migration files.
+3. Completed: scaffold the Python AI server with fake deterministic detection/generation responses.
+4. Completed: scaffold the NestJS server and connect it to the fake AI service contract.
+5. Completed: scaffold the Flutter app and build the user flow against the NestJS API contract.
+6. Next: replace fake AI behavior with real model-backed behavior behind the same Python AI service contract.
+7. Next: provide result image serving/download behavior.
+8. Next: add privacy, retention, cleanup, and operational documentation.
+
+## Resolved Decisions
+
+- Runtime and package manager baseline: Flutter 3.22.1 / Dart 3.4.1 for `apps/mobile`, Node.js 22 / npm for `apps/backend`, Python 3.12 / FastAPI for `apps/ai`, and plain PostgreSQL SQL migrations in `database`.
+- The first vertical slice uses deterministic fake AI behavior so the Flutter app, NestJS backend, and Python AI service can integrate before model selection is final.
+- The NestJS backend stores uploaded files through local storage by default, uses PostgreSQL when `DATABASE_URL` is set, and falls back to in-memory workflow storage when `DATABASE_URL` is absent.
 
 ## Open Decisions
 
-- Exact runtime versions and package managers.
 - Whether users can use the service anonymously.
-- Storage location for source photos, face crops, and generated outputs.
+- Production storage location for source photos, face crops, and generated outputs.
 - Retention and deletion periods.
 - Whether job execution is synchronous, queued, or worker-backed.
 - Exact ID-photo output standards.
 - Whether outputs must satisfy country-specific ID-photo rules.
-- Whether to use fake AI responses for the first vertical slice before model integration.
 - Deployment and operations model.
 
 ## Spec Self-Review
