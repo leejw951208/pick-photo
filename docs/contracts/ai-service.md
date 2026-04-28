@@ -18,9 +18,9 @@ Request fields:
 Response fields:
 
 - `upload_id`
-- `faces[]`
+- `faces`
 
-Each `faces[]` item contains:
+Each item in `faces` contains:
 
 - `face_id`
 - `face_index`
