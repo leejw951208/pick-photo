@@ -1,5 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { FakeAiClient } from '../ai/ai-client';
+import { randomUUID } from 'node:crypto';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { AI_CLIENT } from '../ai/ai-client';
+import type { AiClient } from '../ai/ai-client';
 import {
   CreateGenerationRequestDto,
   CreateGenerationResponseDto,
@@ -8,28 +15,97 @@ import {
   GenerationStatusResponseDto,
   UploadPhotoResponseDto,
 } from './dto';
+import { PHOTO_STORAGE } from './photo-storage';
+import type { PhotoStorage } from './photo-storage';
+import { PHOTO_WORKFLOW_REPOSITORY } from './photo-workflow.repository';
+import type {
+  GeneratedPhotoRecord,
+  PhotoWorkflowRepository,
+} from './photo-workflow.repository';
+
+export interface UploadPhotoFileInput {
+  originalName: string;
+  contentType: string;
+  byteSize: number;
+  bytes: Buffer;
+}
 
 @Injectable()
 export class PhotosService {
-  private readonly aiClient = new FakeAiClient();
-  private readonly uploads = new Map<string, { storageKey: string; faces: DetectedFaceDto[] }>();
-  private readonly generations = new Map<string, GenerationStatusResponseDto>();
+  constructor(
+    @Inject(AI_CLIENT) private readonly aiClient: AiClient,
+    @Inject(PHOTO_STORAGE) private readonly photoStorage: PhotoStorage,
+    @Inject(PHOTO_WORKFLOW_REPOSITORY)
+    private readonly repository: PhotoWorkflowRepository,
+  ) {}
 
-  async createUpload(filename: string): Promise<UploadPhotoResponseDto> {
-    const uploadId = `upload-${this.uploads.size + 1}`;
-    const storageKey = `uploads/${filename}`;
-    const faces = await this.aiClient.detectFaces({ uploadId, storageKey });
-    this.uploads.set(uploadId, { storageKey, faces });
-    return { uploadId, status: faces.length === 0 ? 'failed' : 'succeeded' };
+  async createUpload(
+    file: UploadPhotoFileInput,
+  ): Promise<UploadPhotoResponseDto> {
+    const uploadId = randomUUID();
+    const storageKey = await this.photoStorage.saveUpload({
+      uploadId,
+      originalName: file.originalName,
+      contentType: file.contentType,
+      bytes: file.bytes,
+    });
+
+    await this.repository.createUpload({
+      uploadId,
+      originalFilename: file.originalName,
+      contentType: file.contentType,
+      byteSize: file.byteSize,
+      storageKey,
+      status: 'processing',
+    });
+
+    const detectedFaces = await this.detectFaces(uploadId, storageKey);
+    if (!detectedFaces) {
+      return { uploadId, status: 'failed' };
+    }
+
+    const faces = this.toStoredFaces(detectedFaces);
+    const status = faces.length === 0 ? 'failed' : 'succeeded';
+
+    await this.repository.completeFaceDetection({
+      uploadId,
+      status,
+      faces,
+      errorCategory: faces.length === 0 ? 'face_not_found' : undefined,
+    });
+
+    return { uploadId, status };
   }
 
-  getFaces(uploadId: string): DetectedFacesResponseDto {
-    const upload = this.uploads.get(uploadId);
+  private async detectFaces(
+    uploadId: string,
+    storageKey: string,
+  ): Promise<DetectedFaceDto[] | undefined> {
+    try {
+      return await this.aiClient.detectFaces({ uploadId, storageKey });
+    } catch (error) {
+      await this.repository.completeFaceDetection({
+        uploadId,
+        status: 'failed',
+        faces: [],
+        errorCategory: 'face_detection_failed',
+        errorMessage:
+          error instanceof Error ? error.message : 'Face detection failed.',
+      });
+      return undefined;
+    }
+  }
+
+  async getFaces(uploadId: string): Promise<DetectedFacesResponseDto> {
+    const upload = await this.repository.findUpload(uploadId);
     return { uploadId, faces: upload?.faces ?? [] };
   }
 
-  async createGeneration(uploadId: string, request: CreateGenerationRequestDto): Promise<CreateGenerationResponseDto> {
-    const upload = this.uploads.get(uploadId);
+  async createGeneration(
+    uploadId: string,
+    request: CreateGenerationRequestDto,
+  ): Promise<CreateGenerationResponseDto> {
+    const upload = await this.repository.findUpload(uploadId);
     if (!upload) {
       throw new NotFoundException({
         message: 'Upload was not found.',
@@ -39,36 +115,58 @@ export class PhotosService {
 
     const selectedFaces = this.resolveSelectedFaces(upload.faces, request);
 
-    const generationId = `generation-${this.generations.size + 1}`;
-    const results: GenerationStatusResponseDto['results'] = [];
-
-    for (const face of selectedFaces) {
-      const result = await this.aiClient.generateIdPhoto({
-        uploadId,
-        faceId: face.id,
-        sourceStorageKey: upload.storageKey,
-        box: face.box,
-      });
-      results.push({
-        generatedPhotoId: `${generationId}-${face.id}`,
-        faceId: face.id,
-        resultUrl: `/results/${result.resultStorageKey}`,
-      });
-    }
-
-    this.generations.set(generationId, {
+    const generationId = randomUUID();
+    await this.repository.createGeneration({
       generationId,
-      status: results.length === 0 ? 'failed' : 'succeeded',
-      results,
-      errorCategory: results.length === 0 ? 'selection_invalid' : undefined,
+      uploadId,
+      selectionMode: request.selectionMode,
+      selectedFaces,
+      status: selectedFaces.length === 0 ? 'failed' : 'processing',
     });
 
-    return { generationId, status: results.length === 0 ? 'failed' : 'succeeded' };
+    if (selectedFaces.length === 0) {
+      await this.repository.completeGeneration({
+        generationId,
+        status: 'failed',
+        results: [],
+        errorCategory: 'selection_invalid',
+      });
+
+      return { generationId, status: 'failed' };
+    }
+
+    const generationResult = await this.generateResults(
+      uploadId,
+      upload.storageKey,
+      selectedFaces,
+    );
+
+    if (!generationResult.results) {
+      await this.repository.completeGeneration({
+        generationId,
+        status: 'failed',
+        results: [],
+        errorCategory: 'generation_failed',
+        errorMessage: generationResult.errorMessage,
+      });
+
+      return { generationId, status: 'failed' };
+    }
+
+    await this.repository.completeGeneration({
+      generationId,
+      status: 'succeeded',
+      results: generationResult.results,
+    });
+
+    return { generationId, status: 'succeeded' };
   }
 
-  getGeneration(generationId: string): GenerationStatusResponseDto {
+  async getGeneration(
+    generationId: string,
+  ): Promise<GenerationStatusResponseDto> {
     return (
-      this.generations.get(generationId) ?? {
+      (await this.repository.findGeneration(generationId)) ?? {
         generationId,
         status: 'failed',
         results: [],
@@ -81,7 +179,10 @@ export class PhotosService {
     faces: DetectedFaceDto[],
     request: CreateGenerationRequestDto,
   ): DetectedFaceDto[] {
-    if (request.selectionMode !== 'single_face' && request.selectionMode !== 'all_faces') {
+    if (
+      request.selectionMode !== 'single_face' &&
+      request.selectionMode !== 'all_faces'
+    ) {
       throw new BadRequestException({
         message: 'selectionMode must be single_face or all_faces.',
         errorCategory: 'selection_invalid',
@@ -108,5 +209,49 @@ export class PhotosService {
     }
 
     return [selectedFace];
+  }
+
+  private toStoredFaces(faces: DetectedFaceDto[]): DetectedFaceDto[] {
+    return faces.map((face) => ({
+      ...face,
+      id: randomUUID(),
+      box: { ...face.box },
+    }));
+  }
+
+  private async generateResults(
+    uploadId: string,
+    sourceStorageKey: string,
+    selectedFaces: DetectedFaceDto[],
+  ): Promise<{ results?: GeneratedPhotoRecord[]; errorMessage?: string }> {
+    const results: GeneratedPhotoRecord[] = [];
+
+    try {
+      for (const face of selectedFaces) {
+        const result = await this.aiClient.generateIdPhoto({
+          uploadId,
+          faceId: face.id,
+          sourceStorageKey,
+          box: face.box,
+        });
+        results.push({
+          generatedPhotoId: randomUUID(),
+          faceId: face.id,
+          resultUrl: `/results/${result.resultStorageKey}`,
+          storageKey: result.resultStorageKey,
+          width: result.width,
+          height: result.height,
+          contentType: result.contentType,
+          byteSize: result.byteSize,
+        });
+      }
+
+      return { results };
+    } catch (error) {
+      return {
+        errorMessage:
+          error instanceof Error ? error.message : 'Generation failed.',
+      };
+    }
   }
 }

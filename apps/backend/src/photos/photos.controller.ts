@@ -40,6 +40,12 @@ type UploadedPhotoFile = {
   originalname?: string;
   mimetype?: string;
   size?: number;
+  buffer?: Buffer;
+};
+type ValidUploadedPhotoFile = UploadedPhotoFile & {
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
 };
 
 @Controller('photos')
@@ -62,14 +68,20 @@ export class PhotosController {
   })
   createUpload(@UploadedFile() file: UploadedPhotoFile | undefined) {
     this.validateUpload(file);
-    return this.photosService.createUpload(
-      file.originalname ?? 'uploaded-photo',
-    );
+    return this.photosService.createUpload({
+      originalName: file.originalname ?? 'uploaded-photo',
+      contentType: file.mimetype,
+      byteSize: file.size,
+      bytes: file.buffer,
+    });
   }
 
   @Get('uploads/:uploadId/faces')
   @ApiOperation({ summary: 'Fetch detected faces for an upload' })
-  @ApiParam({ name: 'uploadId', example: 'upload-1' })
+  @ApiParam({
+    name: 'uploadId',
+    example: '8c6b41c8-6d4b-4a15-9ec7-c76978b3f1f2',
+  })
   @ApiOkResponse({
     description: 'Detected face list for the upload.',
     schema: detectedFacesResponseSchema,
@@ -82,7 +94,10 @@ export class PhotosController {
   @ApiOperation({
     summary: 'Request ID-photo generation for one face or all faces',
   })
-  @ApiParam({ name: 'uploadId', example: 'upload-1' })
+  @ApiParam({
+    name: 'uploadId',
+    example: '8c6b41c8-6d4b-4a15-9ec7-c76978b3f1f2',
+  })
   @ApiBody({ schema: createGenerationBodySchema })
   @ApiCreatedResponse({
     description: 'Generation job was created.',
@@ -105,7 +120,10 @@ export class PhotosController {
 
   @Get('generations/:generationId')
   @ApiOperation({ summary: 'Fetch generation status and generated results' })
-  @ApiParam({ name: 'generationId', example: 'generation-1' })
+  @ApiParam({
+    name: 'generationId',
+    example: 'c421064e-5d0a-4aa8-8c70-bfb85fb8ecf6',
+  })
   @ApiOkResponse({
     description: 'Generation status and result list.',
     schema: generationStatusResponseSchema,
@@ -116,7 +134,7 @@ export class PhotosController {
 
   private validateUpload(
     file: UploadedPhotoFile | undefined,
-  ): asserts file is UploadedPhotoFile {
+  ): asserts file is ValidUploadedPhotoFile {
     if (!file) {
       throw new BadRequestException({
         message: 'Multipart field photo is required.',
@@ -141,6 +159,13 @@ export class PhotosController {
     if (file.size > MAX_UPLOAD_BYTES) {
       throw new BadRequestException({
         message: 'Uploaded file is too large.',
+        errorCategory: 'upload_invalid',
+      });
+    }
+
+    if (!Buffer.isBuffer(file.buffer)) {
+      throw new BadRequestException({
+        message: 'Uploaded file bytes are required.',
         errorCategory: 'upload_invalid',
       });
     }

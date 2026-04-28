@@ -10,6 +10,7 @@ __pycache__/
 # Node/NestJS
 node_modules/
 dist/
+apps/backend/storage/
 
 # Flutter/Dart
 .dart_tool/

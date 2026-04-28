@@ -45,7 +45,9 @@ describe('Photos workflow', () => {
   });
 
   it('rejects a missing upload file', async () => {
-    const response = await request(app.getHttpServer()).post('/photos/uploads').expect(400);
+    const response = await request(app.getHttpServer())
+      .post('/photos/uploads')
+      .expect(400);
 
     expect(response.body.errorCategory).toBe('upload_invalid');
   });
@@ -85,7 +87,10 @@ describe('Photos workflow', () => {
 
     const response = await request(app.getHttpServer())
       .post(`/photos/uploads/${upload.body.uploadId}/generations`)
-      .send({ selectionMode: 'primary_face', faceId: `${upload.body.uploadId}-face-0` })
+      .send({
+        selectionMode: 'primary_face',
+        faceId: `${upload.body.uploadId}-face-0`,
+      })
       .expect(400);
 
     expect(response.body.errorCategory).toBe('selection_invalid');
@@ -129,7 +134,9 @@ describe('Photos workflow', () => {
   });
 
   it('returns failed result unavailable status for an unknown generation lookup', async () => {
-    const result = await request(app.getHttpServer()).get('/photos/generations/generation-missing').expect(200);
+    const result = await request(app.getHttpServer())
+      .get('/photos/generations/generation-missing')
+      .expect(200);
 
     expect(result.body).toEqual({
       generationId: 'generation-missing',

@@ -13,8 +13,9 @@
 - App shape: independent project folders are `apps/mobile/`, `apps/backend/`, `apps/ai/`, and `database/`; cross-project behavior is coordinated through `docs/contracts/` rather than shared application code.
 - Flutter app: `apps/mobile/` is a Flutter app named `pick_photo`; source entrypoint is `apps/mobile/lib/main.dart`; photo-flow feature files live in `apps/mobile/lib/features/photo_flow/`; the app uses a file picker and `NestPhotoFlowApi` to upload selected photos to `http://localhost:3000` by default, configurable with `PICK_PHOTO_API_BASE_URL`.
 - NestJS server: `apps/backend/` is a private npm project using NestJS; source entrypoint is `apps/backend/src/main.ts`; photo API files live in `apps/backend/src/photos/`; AI adapter lives in `apps/backend/src/ai/`; local CORS is enabled; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
+- Backend storage and adapter behavior: uploaded files are stored through `LocalPhotoStorage`, defaulting to `apps/backend/storage/` when run from `apps/backend`; `PHOTO_STORAGE_DIR` overrides that path; `AI_SERVICE_BASE_URL` enables the Python AI HTTP adapter and absence of that env var falls back to deterministic fake AI; `DATABASE_URL` enables the PostgreSQL repository using `pg` and absence of that env var falls back to the in-memory repository.
 - Python AI server: `apps/ai/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `apps/ai/app/main.py`; deterministic fake AI behavior lives in `apps/ai/app/fake_ai.py`.
-- Database assets: `database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `database/seeds/README.md` reserves the seed workflow. No migration runner or local PostgreSQL server command is verified yet.
+- Database assets: `database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `database/seeds/README.md` reserves the seed workflow. Backend repository code can write workflow metadata to PostgreSQL when `DATABASE_URL` is configured, but no migration runner or local PostgreSQL server command is verified yet.
 - Languages and runtimes:
   - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `apps/mobile/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
   - Node.js v22.20.0 and npm 10.9.3 are verified locally; `apps/backend/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
@@ -42,7 +43,7 @@
 - Decision needed: infrastructure folder shape, deployment target, environment variable policy, secrets management, observability, and operations commands.
 - Decision needed: authentication policy, real upload storage, real job orchestration, production data retention policy, and production error model.
 - Decision needed: Python AI model stack, production face detection/selection pipeline, production ID-photo generation pipeline, model artifact storage, and inference hardware expectations.
-- Decision needed: PostgreSQL migration runner, ORM or query layer, transaction policy, seed/fixture workflow, and local PostgreSQL validation command.
+- Decision needed: PostgreSQL migration runner, production transaction policy, seed/fixture workflow, and local PostgreSQL validation command.
 - Decision needed: local development commands beyond the verified validation commands, lint coverage policy, Docker, deployment, observability, and operations commands.
 - Decision needed: privacy, consent, personal data handling, image retention, deletion, logging redaction, and compliance requirements for uploaded photos and generated ID photos.
 

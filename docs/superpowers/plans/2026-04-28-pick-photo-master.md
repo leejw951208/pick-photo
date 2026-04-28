@@ -2,6 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+## 진행 현황 (2026-04-28)
+
+- 완료: 계약 문서, PostgreSQL 초기 스키마, Python AI fake 서버, NestJS API/Swagger/fake 워크플로, Flutter 업로드/얼굴 선택/생성 요청 흐름, `apps/mobile`, `apps/backend`, `apps/ai` 폴더 구조 정리.
+- 완료: NestJS 백엔드 업로드 로컬 저장, `DATABASE_URL` 기반 PostgreSQL 저장소 어댑터, `AI_SERVICE_BASE_URL` 기반 Python AI 서버 HTTP 어댑터 연결.
+- 다음 예정: 실제 AI 모델 기반 얼굴 인식/증명사진 생성, 결과 이미지 제공 방식, 보관/삭제/정리 작업, 운영 문서와 로컬 PostgreSQL 검증 흐름.
+- 참고: `PRD.md`는 서비스 정의 문서이므로 진행 상태와 기술 구현 내용은 이 계획 문서와 계약 문서에만 기록한다.
+
 **Goal:** Establish the multi-project Pick Photo foundation and connect the first upload-to-result workflow through explicit contracts.
 
 **Architecture:** Keep the Flutter app, NestJS server, Python AI server, and PostgreSQL assets in independent folders. Cross-project behavior is coordinated through documented contracts in `docs/contracts` rather than shared code.

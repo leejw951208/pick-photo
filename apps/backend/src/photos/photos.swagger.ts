@@ -34,7 +34,7 @@ export const uploadPhotoResponseSchema: SchemaObject = {
   properties: {
     uploadId: {
       type: 'string',
-      example: 'upload-1',
+      example: '8c6b41c8-6d4b-4a15-9ec7-c76978b3f1f2',
     },
     status: {
       type: 'string',
@@ -50,7 +50,7 @@ export const detectedFacesResponseSchema: SchemaObject = {
   properties: {
     uploadId: {
       type: 'string',
-      example: 'upload-1',
+      example: '8c6b41c8-6d4b-4a15-9ec7-c76978b3f1f2',
     },
     faces: {
       type: 'array',
@@ -60,7 +60,7 @@ export const detectedFacesResponseSchema: SchemaObject = {
         properties: {
           id: {
             type: 'string',
-            example: 'upload-1-face-0',
+            example: 'f4fdba79-09ec-44c4-8d95-61f4f61d282b',
           },
           faceIndex: {
             type: 'number',
@@ -110,7 +110,7 @@ export const createGenerationBodySchema: SchemaObject = {
     faceId: {
       type: 'string',
       description: 'Required when selectionMode is single_face.',
-      example: 'upload-1-face-0',
+      example: 'f4fdba79-09ec-44c4-8d95-61f4f61d282b',
     },
   },
 };
@@ -121,7 +121,7 @@ export const createGenerationResponseSchema: SchemaObject = {
   properties: {
     generationId: {
       type: 'string',
-      example: 'generation-1',
+      example: 'c421064e-5d0a-4aa8-8c70-bfb85fb8ecf6',
     },
     status: {
       type: 'string',
@@ -137,7 +137,7 @@ export const generationStatusResponseSchema: SchemaObject = {
   properties: {
     generationId: {
       type: 'string',
-      example: 'generation-1',
+      example: 'c421064e-5d0a-4aa8-8c70-bfb85fb8ecf6',
     },
     status: {
       type: 'string',
@@ -152,15 +152,16 @@ export const generationStatusResponseSchema: SchemaObject = {
         properties: {
           generatedPhotoId: {
             type: 'string',
-            example: 'generation-1-upload-1-face-0',
+            example: '6c01c2dd-2734-4dd2-8ff6-5d31a86336e0',
           },
           faceId: {
             type: 'string',
-            example: 'upload-1-face-0',
+            example: 'f4fdba79-09ec-44c4-8d95-61f4f61d282b',
           },
           resultUrl: {
             type: 'string',
-            example: '/results/generated/upload-1-face-0.jpg',
+            example:
+              '/results/generated/8c6b41c8-6d4b-4a15-9ec7-c76978b3f1f2/f4fdba79-09ec-44c4-8d95-61f4f61d282b.jpg',
           },
         },
       },

@@ -2,6 +2,12 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+## 진행 현황 (2026-04-28)
+
+- 완료: NestJS 프로젝트 생성, 사진 업로드 API, 얼굴 목록 API, 생성 요청 API, 생성 결과 API, Swagger 문서, fake AI 기반 in-memory 워크플로.
+- 완료: 업로드 파일 로컬 저장소, PostgreSQL 저장소 어댑터, Python AI 서버 HTTP 어댑터.
+- 남은 작업: 실제 AI 모델 결과 저장, 결과 이미지 제공/다운로드, 보관/삭제 정책 실행, 로컬 PostgreSQL 검증 명령 확정.
+
 **Goal:** Build the application server that owns public workflow APIs and coordinates upload, face detection, selection, generation, persistence, and AI service calls.
 
 **Architecture:** Keep the NestJS server in `apps/backend/`. The server exposes public API endpoints to the Flutter app and calls the Python AI server through a narrow adapter.

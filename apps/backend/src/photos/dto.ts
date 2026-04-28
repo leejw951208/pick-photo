@@ -1,4 +1,9 @@
-export type WorkflowStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'deleted';
+export type WorkflowStatus =
+  | 'pending'
+  | 'processing'
+  | 'succeeded'
+  | 'failed'
+  | 'deleted';
 
 export type ErrorCategory =
   | 'upload_invalid'
