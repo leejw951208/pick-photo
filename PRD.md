@@ -1,85 +1,201 @@
-# Product Summary
+# PRD: Pick Photo
 
-Pick Photo is a service that creates ID-photo style images from user-uploaded photos. The service finds faces in an uploaded photo, lets the user choose one detected face or all detected faces, and produces ID-photo style results for the chosen face or faces.
+## 1. 요약
 
-# Service Definition
+Pick Photo는 사용자가 업로드한 일반 사진에서 얼굴을 찾고, 사용자가 선택한 얼굴 하나 또는 모든 얼굴을 증명사진 스타일 이미지로 만들어 주는 서비스다.
 
-Pick Photo helps users turn ordinary personal or group photos into clean, ID-photo style images without manually cropping faces or preparing each person one by one.
+이 서비스는 직접 얼굴을 자르고 보정 기준을 맞추기 어려운 사용자가, 사진 한 장만으로 원하는 사람의 증명사진 스타일 결과를 빠르게 얻도록 돕는다. 핵심 경험은 사진 업로드, 얼굴 인식, 얼굴 선택, 증명사진 생성, 결과 확인으로 이어진다.
 
-The service is centered on three product promises:
+## 2. 문제
 
-- Find faces in an uploaded photo.
-- Let the user decide which face or faces should be used.
-- Generate ID-photo style images from those selections.
+사용자가 기존 사진으로 증명사진 스타일 이미지를 만들려면 얼굴을 찾고, 적절히 자르고, 배경과 구도를 맞추는 과정을 직접 처리해야 한다. 한 사진에 여러 사람이 있을 때는 원하는 사람만 고르거나 모든 사람을 각각 처리하는 일이 더 번거롭다.
 
-# Core User Experience
+사용자는 어떤 얼굴이 선택되었는지 명확히 확인하지 못한 채 결과가 생성되면 불안하거나 불편함을 느낄 수 있다. 사진과 얼굴은 민감한 개인 정보에 해당하므로, 서비스는 처리 과정과 사용자의 선택을 분명하게 보여줘야 한다.
 
-The expected user journey is:
+## 3. 제품 의도
 
-1. The user uploads a photo.
-2. The service searches the photo for faces.
-3. The user reviews the detected faces.
-4. The user selects one face or chooses all detected faces.
-5. The service generates ID-photo style images.
-6. The user reviews and saves the generated results.
+Pick Photo의 목적은 사용자가 복잡한 편집 과정 없이 기존 사진을 증명사진 스타일 결과로 바꿀 수 있게 하는 것이다.
 
-# Users And Use Cases
+제품 판단 원칙은 다음과 같다.
 
-- Primary user: A person who wants to create an ID-photo style image from an existing photo.
-- Single-person use case: A user uploads a personal photo and creates one ID-photo style result.
-- Group-photo use case: A user uploads a photo containing multiple people and creates separate ID-photo style results for each detected face.
-- Selection use case: A user chooses only one desired face from a photo containing multiple faces.
-- Retry use case: A user receives clear guidance when no face is found, the wrong face is selected, or generation fails.
+- 사용자가 선택한 얼굴만 결과 생성 대상이 되어야 한다.
+- 사용자는 생성 전에 어떤 얼굴이 선택되었는지 이해할 수 있어야 한다.
+- 얼굴을 찾지 못하거나 생성에 실패한 경우, 사용자는 무엇이 일어났는지 알고 다시 시도할 수 있어야 한다.
+- 사진과 얼굴 정보는 민감한 정보로 취급되어야 하며, 보관과 삭제 기대가 사용자에게 분명해야 한다.
+- "증명사진 스타일"은 단순한 얼굴 자르기가 아니라 얼굴 중심 구도, 정돈된 인상, 결과 검토 가능성을 포함해야 한다.
 
-# Current Product Surfaces
+## 4. 목표
 
-- Photo upload experience: To be defined.
-- Face review and selection experience: To be defined.
-- ID-photo generation progress experience: To be defined.
-- Generated result review and save experience: To be defined.
+- 사용자가 사진을 업로드하면 얼굴 인식 결과를 확인할 수 있다.
+- 사용자가 인식된 얼굴 중 하나를 선택할 수 있다.
+- 사용자가 인식된 모든 얼굴을 한 번에 선택할 수 있다.
+- 선택된 얼굴마다 증명사진 스타일 결과가 생성된다.
+- 사용자가 결과를 저장하거나 사용하기 전에 확인할 수 있다.
+- 얼굴이 없거나 실패한 상황에서도 사용자가 다음 행동을 이해할 수 있다.
+- 사진 처리와 관련된 개인정보 기대가 제품 경험 안에서 명확하게 전달된다.
 
-# Functional Requirements
+## 5. 비목표
 
-- The service must accept a user photo.
-- The service must detect faces in the uploaded photo.
-- The service must show detected faces clearly enough for the user to choose among them.
-- The service must allow choosing one detected face.
-- The service must allow choosing all detected faces.
-- The service must generate one ID-photo style image for each selected face.
-- The service must communicate when no face is found.
-- The service must communicate when generation is in progress.
-- The service must communicate when generation succeeds.
-- The service must communicate when generation fails and the user can try again.
-- The service must let the user review generated results before saving or using them.
+- 실시간 영상 처리.
+- 사용자가 직접 수행하는 세부 보정 도구.
+- 실물 사진 인화 또는 배송.
+- 공공기관 제출 대행.
+- 신원 확인 또는 본인 인증.
+- 국가별 증명사진 규격 보장.
+- 결제, 구독, 사용량 제한 정책.
+- 계정 기반 장기 보관 기능.
 
-# Product Quality Requirements
+## 6. 대상 사용자
 
-- The generated image should look like an ID-photo style image rather than a casual crop.
-- The selected face should remain recognizable and centered in the generated result.
-- The user should understand which face is selected before generation begins.
-- The service should avoid surprising the user by generating photos for faces they did not choose.
-- The service should handle photos with no faces, one face, and multiple faces.
-- The service should provide clear language for sensitive photo handling and user consent.
-- The service should make deletion, retention, and privacy expectations understandable to users.
+### 개인 사용자
 
-# Out Of Scope
+- 필요: 기존 사진에서 본인 얼굴을 골라 증명사진 스타일 결과를 만들고 싶다.
+- 기대 결과: 본인 얼굴이 중심이 된 결과를 확인하고 저장할 수 있다.
 
-- Real-time video processing.
-- Manual photo retouching tools beyond the automated ID-photo style generation flow.
-- Physical printing or delivery.
-- Government document submission.
-- Third-party identity verification.
-- Payment or subscription features unless added later.
+### 단체 사진을 가진 사용자
 
-# Product Decisions To Define
+- 필요: 여러 사람이 있는 사진에서 특정 인물만 고르거나 모든 인물의 결과를 만들고 싶다.
+- 기대 결과: 선택한 인물만 생성 대상이 되며, 인물별 결과를 구분해 확인할 수 있다.
 
-- Decision needed: exact target users and priority use cases.
-- Decision needed: whether the service is optimized for personal photos, group photos, or both equally.
-- Decision needed: what "ID-photo style" means for this product.
-- Decision needed: supported output sizes, background colors, crop style, and quality expectations.
-- Decision needed: whether generated outputs must follow country-specific ID-photo rules.
-- Decision needed: whether users can edit or adjust generated results after creation.
-- Decision needed: maximum number of photos, detected faces, and generated results per user flow.
-- Decision needed: privacy notice, consent language, retention expectations, and deletion expectations.
-- Decision needed: whether users need accounts or can use the service anonymously.
-- Decision needed: whether generated results are free, paid, or limited by usage.
+### 재시도 사용자
+
+- 필요: 얼굴을 찾지 못했거나 결과가 마음에 들지 않을 때 다시 시도하고 싶다.
+- 기대 결과: 실패 이유와 다음 행동을 이해하고 새 사진으로 흐름을 다시 시작할 수 있다.
+
+## 7. 사용자 시나리오
+
+- 개인 사용자로서, 기존 사진을 업로드해 내 얼굴을 증명사진 스타일로 만들고 싶다. 그래야 새 사진을 촬영하지 않고도 필요한 이미지를 준비할 수 있다.
+- 단체 사진을 가진 사용자로서, 인식된 여러 얼굴 중 한 명만 선택하고 싶다. 그래야 원하지 않는 사람의 결과가 생성되지 않는다.
+- 단체 사진을 가진 사용자로서, 사진 안의 모든 얼굴을 한 번에 선택하고 싶다. 그래야 여러 사람의 결과를 반복 작업 없이 만들 수 있다.
+- 재시도 사용자로서, 얼굴이 인식되지 않았을 때 명확한 안내를 받고 싶다. 그래야 다른 사진으로 다시 시도할 수 있다.
+- 결과 확인 사용자로서, 생성된 결과를 저장하기 전에 확인하고 싶다. 그래야 잘못된 결과를 그대로 사용하지 않는다.
+
+## 8. 기능 요구사항
+
+- FR-001: 사용자는 사진 한 장을 선택해 업로드 흐름을 시작할 수 있어야 한다.
+- FR-002: 서비스는 업로드된 사진에서 얼굴을 찾아야 한다.
+- FR-003: 서비스는 얼굴이 하나 이상 발견되면 발견된 얼굴 목록을 사용자에게 보여줘야 한다.
+- FR-004: 서비스는 얼굴이 발견되지 않으면 실패 상태와 재시도 가능성을 사용자에게 알려야 한다.
+- FR-005: 사용자는 발견된 얼굴 중 하나를 선택해 증명사진 생성을 요청할 수 있어야 한다.
+- FR-006: 사용자는 발견된 모든 얼굴을 선택해 증명사진 생성을 요청할 수 있어야 한다.
+- FR-007: 서비스는 선택된 얼굴마다 하나의 증명사진 스타일 결과를 생성해야 한다.
+- FR-008: 서비스는 선택되지 않은 얼굴에 대해서는 결과를 생성하지 않아야 한다.
+- FR-009: 서비스는 업로드, 얼굴 인식, 생성, 완료, 실패 상태를 사용자가 이해할 수 있게 표현해야 한다.
+- FR-010: 생성이 실패하면 사용자는 실패를 인지하고 다시 시도할 수 있어야 한다.
+- FR-011: 사용자는 생성된 결과를 저장하거나 사용하기 전에 확인할 수 있어야 한다.
+- FR-012: 사용자는 새 사진으로 처음부터 다시 시작할 수 있어야 한다.
+- FR-013: 서비스는 사진 처리와 관련된 동의, 보관, 삭제 기대를 사용자가 이해할 수 있게 안내해야 한다.
+
+## 9. 비기능 요구사항
+
+- NFR-001: 결과 이미지는 단순한 얼굴 자르기가 아니라 증명사진 스타일로 인식될 만큼 얼굴 중심 구도와 정돈된 인상을 가져야 한다.
+- NFR-002: 결과 이미지는 선택한 얼굴의 식별 가능성을 훼손하지 않아야 한다.
+- NFR-003: 얼굴 선택 화면은 사용자가 서로 다른 얼굴을 구분할 수 있을 만큼 명확해야 한다.
+- NFR-004: 사용자의 명시적 선택 없이 다른 얼굴의 결과가 생성되어서는 안 된다.
+- NFR-005: 오류 메시지는 사용자가 다음 행동을 정할 수 있을 만큼 구체적이어야 한다.
+- NFR-006: 사진, 얼굴, 생성 결과는 민감한 개인 정보로 취급되어야 한다.
+- NFR-007: 주요 흐름은 모바일 화면에서도 이해 가능하고 조작 가능해야 한다.
+- NFR-008: 반복 요청이나 중복 조작이 발생해도 사용자에게 모순된 결과가 보이지 않아야 한다.
+
+## 10. 정보 및 상태 요구사항
+
+- 원본 사진: 사용자가 선택한 사진이며 얼굴 인식과 결과 생성의 출발점이다.
+- 인식된 얼굴: 원본 사진 안에서 발견된 얼굴 단위이며, 사용자가 선택할 수 있어야 한다.
+- 선택 상태: 사용자가 선택한 얼굴 하나 또는 모든 얼굴을 나타낸다.
+- 생성 요청: 선택된 얼굴을 증명사진 스타일 결과로 만들기 위한 사용자 의사 표현이다.
+- 생성 결과: 선택된 얼굴 하나에 대응되는 결과 이미지다.
+- 흐름 상태: 시작 전, 업로드 중, 얼굴 검토 중, 생성 중, 완료, 실패, 삭제 또는 만료 상태를 구분할 수 있어야 한다.
+- 보관 및 삭제 기대: 원본 사진, 인식된 얼굴 정보, 생성 결과가 얼마나 보관되는지와 어떻게 삭제되는지는 제품 정책으로 명확해야 한다.
+
+## 11. 외부 접점
+
+- 사진 선택 및 업로드 화면: 사용자가 사진을 선택하고 처리 흐름을 시작하는 접점이다.
+- 얼굴 검토 및 선택 화면: 사용자가 인식된 얼굴을 확인하고 하나 또는 전체를 선택하는 접점이다.
+- 생성 진행 화면: 사용자가 현재 처리 상태를 이해하는 접점이다.
+- 결과 검토 화면: 사용자가 생성된 결과를 확인하고 저장 여부를 판단하는 접점이다.
+- 개인정보 및 동의 안내: 사용자가 사진 처리와 보관 기대를 이해하는 접점이다.
+- 오류 및 재시도 안내: 얼굴 없음, 잘못된 선택, 생성 실패 같은 상황에서 사용자가 다음 행동을 정하는 접점이다.
+
+## 12. 인수 기준
+
+- AC-001: Given 사용자가 사진을 선택했을 때, when 업로드 흐름을 시작하면, then 서비스는 얼굴 인식 진행 상태를 보여준다.
+- AC-002: Given 업로드된 사진에 얼굴이 있을 때, when 얼굴 인식이 완료되면, then 사용자는 발견된 얼굴 목록을 확인할 수 있다.
+- AC-003: Given 업로드된 사진에 얼굴이 없을 때, when 얼굴 인식이 완료되면, then 사용자는 얼굴을 찾지 못했다는 안내와 재시도 가능성을 확인한다.
+- AC-004: Given 얼굴이 하나 이상 발견되었을 때, when 사용자가 특정 얼굴 하나를 선택하면, then 선택된 얼굴 하나만 생성 대상이 된다.
+- AC-005: Given 얼굴이 둘 이상 발견되었을 때, when 사용자가 전체 얼굴 생성을 선택하면, then 발견된 모든 얼굴이 생성 대상이 된다.
+- AC-006: Given 생성 대상 얼굴이 정해졌을 때, when 사용자가 생성을 요청하면, then 서비스는 선택된 얼굴마다 결과 생성을 진행한다.
+- AC-007: Given 생성이 완료되었을 때, when 사용자가 결과 화면을 보면, then 선택된 얼굴마다 생성 결과가 표시된다.
+- AC-008: Given 선택되지 않은 얼굴이 있을 때, when 생성이 완료되면, then 선택되지 않은 얼굴의 결과는 표시되지 않는다.
+- AC-009: Given 생성이 실패했을 때, when 사용자가 실패 상태를 보면, then 실패 안내와 재시도 가능성을 확인할 수 있다.
+- AC-010: Given 사용자가 새 사진으로 다시 시작하려 할 때, when 새 사진을 선택하면, then 이전 선택과 결과는 현재 흐름에 섞이지 않는다.
+- AC-011: Given 사용자가 사진을 처리하려 할 때, when 업로드 전후의 안내를 확인하면, then 사진 처리와 보관 기대를 이해할 수 있다.
+
+## 13. 예외 상황
+
+- 사진에 얼굴이 없다.
+- 사진에 얼굴이 너무 작거나 흐릿하게 나온다.
+- 사진에 여러 얼굴이 있고 사용자가 의도하지 않은 얼굴을 선택할 수 있다.
+- 사용자가 얼굴을 선택하지 않고 생성을 시도한다.
+- 사용자가 같은 동작을 빠르게 반복한다.
+- 생성 중 사용자가 새 사진으로 다시 시작한다.
+- 생성 결과가 선택한 얼굴과 다르게 보인다.
+- 결과 생성이 일부 얼굴에 대해서만 성공한다.
+- 사용자가 사진 처리 동의 또는 보관 안내를 이해하지 못한다.
+
+## 14. 위험
+
+### 잘못된 얼굴 선택
+
+- 영향: 원하지 않는 사람의 결과가 생성되어 개인정보 침해 또는 사용자 불신이 발생할 수 있다.
+- 완화: 생성 전 선택된 얼굴을 명확히 보여주고, 선택되지 않은 얼굴은 생성하지 않는다.
+
+### 증명사진 스타일 기대 불일치
+
+- 영향: 사용자가 결과를 사용할 수 없다고 판단할 수 있다.
+- 완화: 제품에서 의미하는 증명사진 스타일 기준과 지원 범위를 명확히 정한다.
+
+### 민감한 사진 처리에 대한 불안
+
+- 영향: 사용자가 서비스를 신뢰하지 못하거나 업로드를 중단할 수 있다.
+- 완화: 동의, 보관, 삭제 기대를 사용자 언어로 명확히 안내한다.
+
+### 얼굴 인식 실패
+
+- 영향: 사용자가 서비스를 사용할 수 없거나 품질을 낮게 평가할 수 있다.
+- 완화: 실패 상황을 명확히 안내하고, 더 적합한 사진으로 재시도할 수 있게 한다.
+
+## 15. 가정
+
+- 사용자는 한 번의 흐름에서 사진 한 장을 기준으로 작업한다.
+- 첫 제품 범위는 사진 업로드, 얼굴 인식, 얼굴 선택, 증명사진 스타일 생성, 결과 확인이다.
+- 생성 결과는 사용자가 저장하거나 사용할 수 있는 이미지 형태다.
+- 사용자는 결과 생성 전 얼굴 선택을 직접 수행한다.
+- 국가별 공식 규격 충족은 현재 범위가 아니며, 별도 결정이 필요하다.
+- 사진과 얼굴 관련 정보는 민감한 개인 정보로 취급한다.
+
+## 16. 열린 질문
+
+- "증명사진 스타일"의 정확한 기준은 무엇인가?
+- 지원해야 하는 배경색, 비율, 크기, 파일 형식은 무엇인가?
+- 국가별 증명사진 규격을 지원해야 하는가?
+- 한 번에 처리할 수 있는 사진 수, 얼굴 수, 결과 수의 제한은 무엇인가?
+- 생성 후 사용자가 직접 수정할 수 있는 범위가 필요한가?
+- 원본 사진과 생성 결과의 보관 기간 및 삭제 방법은 무엇인가?
+- 계정 없이 사용할 수 있는가, 또는 사용자 계정이 필요한가?
+- 무료 제공인지, 유료 기능인지, 사용량 제한이 있는지 결정이 필요한가?
+- 부분 성공 상황에서 성공 결과와 실패 결과를 어떻게 보여줄 것인가?
+
+## 17. 구현 준비 체크리스트
+
+- [x] 문제 정의가 명확하다.
+- [x] 제품 의도가 명확하다.
+- [x] 목표가 정의되어 있다.
+- [x] 비목표가 정의되어 있다.
+- [x] 대상 사용자가 정의되어 있다.
+- [x] 기능 요구사항이 검증 가능하다.
+- [x] 관련 있는 비기능 요구사항만 포함되어 있다.
+- [x] 인수 기준이 검증 가능하다.
+- [x] 예외 상황이 문서화되어 있다.
+- [x] 가정이 명시되어 있다.
+- [x] 열린 질문이 정리되어 있다.
+- [x] 낮은 수준의 기술 설계를 포함하지 않는다.

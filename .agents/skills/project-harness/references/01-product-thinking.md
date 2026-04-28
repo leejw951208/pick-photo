@@ -9,12 +9,13 @@ Use this step before planning or implementing substantial work.
 - Separate required behavior from optional improvements.
 - Name the smallest useful change that satisfies the request.
 
-## Align With PRD
+## Align With Product Context
 
-- Read `PRD.md` before deciding product behavior.
-- Use verified product facts, requirements, scope, and open decisions from `PRD.md`.
-- Do not invent users, business rules, product goals, or features that are absent from `PRD.md` and repository evidence.
-- If `PRD.md` conflicts with repository evidence, prefer repository evidence and record the conflict as `Decision needed`.
+- Read `PRD.md` when it exists before deciding product behavior.
+- Use verified product facts, requirements, scope, and open decisions from existing `PRD.md`.
+- If `PRD.md` is absent, do not create it unless the user explicitly asks for a separate PRD task.
+- Do not invent users, business rules, product goals, or features that are absent from existing `PRD.md` and repository evidence.
+- If existing `PRD.md` conflicts with repository evidence, prefer repository evidence and record the conflict as `Decision needed`.
 
 ## Identify Risk
 
@@ -24,11 +25,11 @@ Use this step before planning or implementing substantial work.
 
 ## Output
 
-Produce a short product note:
+Produce a short product note in Korean when written outside `.agents/`:
 
 - Goal
 - Non-goals
-- PRD alignment
+- Product context alignment
 - Verified repository context
 - Risks and security-sensitive areas
 - Open decisions

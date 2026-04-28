@@ -3,8 +3,9 @@
 ## Repository Facts
 
 - Repository root: `/Users/leejinwoo/mine/pick-photo`.
-- Repository state at harness creation: no repository-local source files, product docs, project metadata, lockfiles, toolchain config, env examples, Docker files, CI workflows, or VCS metadata were present.
-- Product reference: `PRD.md` is the product/service description baseline. It describes what the service is, who it serves, and product requirements. Do not add technical implementation details to `PRD.md`.
+- Git repository: current branch `main`; `origin` is `https://github.com/leejw951208/pick-photo.git`; latest observed commit is `3139be4 앱: 실제 사진 업로드 연결`.
+- Repository state at original harness creation: no repository-local source files, product docs, project metadata, lockfiles, toolchain config, env examples, Docker files, CI workflows, or VCS metadata were present.
+- Product reference: `PRD.md` is the Korean product requirements baseline. It describes what the service is, who it serves, product requirements, acceptance criteria, assumptions, and open product questions. Do not add technical implementation details to `PRD.md`.
 - Canonical local harness path: `.agents/skills/project-harness/SKILL.md`.
 - System design document: `docs/superpowers/specs/2026-04-28-pick-photo-system-design.md`.
 - Implementation plan documents: `docs/superpowers/plans/2026-04-28-pick-photo-master.md`, `docs/superpowers/plans/2026-04-28-pick-photo-flutter-app.md`, `docs/superpowers/plans/2026-04-28-pick-photo-nestjs-server.md`, `docs/superpowers/plans/2026-04-28-pick-photo-python-ai-server.md`, and `docs/superpowers/plans/2026-04-28-pick-photo-database.md`.
@@ -28,11 +29,12 @@
 
 ## Product Reference
 
-- Read `PRD.md` before all product or engineering work.
+- Read `PRD.md` when it exists before product or engineering work.
 - Treat `PRD.md` as the baseline for product intent, users, requirements, scope, and open product decisions.
 - Keep `PRD.md` product-only. Do not add runtime choices, architecture, API contracts, database schema, package metadata, commands, deployment notes, or other technical implementation details.
 - Do not treat unresolved PRD decisions as verified repository facts.
-- When implementation creates or changes product behavior, check whether `PRD.md` needs a product-level update. Put technical facts, commands, architecture, API behavior, data models, configuration, and security boundaries in `AGENTS.md`, `docs/contracts/`, or implementation plans instead.
+- Do not create or modify `PRD.md` unless the user explicitly asks for a separate PRD task.
+- When implementation creates or changes product behavior, check whether `PRD.md` needs a product-level Korean update. Put technical facts, commands, architecture, API behavior, data models, configuration, and security boundaries in `AGENTS.md`, `docs/contracts/`, or implementation plans instead.
 
 ## Project Decisions To Define
 
@@ -47,10 +49,13 @@
 ## Always-On Rules
 
 - Stay inside the repository root. Do not read, write, modify, summarize, merge, or clean up files outside this repository.
-- Read `AGENTS.md` and `PRD.md` before all work.
+- Read `AGENTS.md` before all work. Read `PRD.md` when it exists.
+- Write `AGENTS.md`, `.agents/skills/project-harness/SKILL.md`, and `.agents/skills/project-harness/references/*.md` in English.
+- Write human-facing documents outside `.agents/` in Korean, including PRDs, product docs, feature docs, implementation plans, review docs, change summaries, and commit messages.
+- Format commit messages as `<commit type>: <Korean message>` on `main` or `dev`; use `[<branch>]<commit type>: <Korean message>` on any other branch.
 - Follow verified repository-local language, runtime, package manager, module, source layout, app-shape, error handling, configuration, and test patterns once they exist.
 - Do not assume a framework, ORM, test runner, build tool, formatter, deployment target, cloud, database, external service, or command unless verified inside the repository or explicitly requested for a new implementation plan.
-- Keep the three intended application areas independent unless a future approved plan defines a shared contract: Flutter client, NestJS application server, and Python AI service.
+- Keep the independent project areas independent unless a future approved plan defines a shared contract: Flutter client, NestJS application server, Python AI service, and database assets.
 - Keep changes small and reviewable. Do not perform unrelated refactors.
 - For substantial work, use `.agents/skills/project-harness/SKILL.md` before implementation.
 - Do not implement substantial changes before product thinking, implementation planning, and plan review are complete.
@@ -58,7 +63,7 @@
 - After an internal `Approved` plan review for substantial work, ask the user to confirm before implementation.
 - Do not proceed from plan review to implementation unless the plan review result is `Approved`.
 - If implementation must materially diverge from the approved plan, stop and get user confirmation before continuing.
-- Keep implementation plans aligned with `PRD.md`; if the plan conflicts with `PRD.md`, update the plan or record the decision before implementing.
+- Keep implementation plans aligned with existing `PRD.md`; if the plan conflicts with `PRD.md`, update the plan or record the decision before implementing.
 - Do not invent product requirements that are absent from `PRD.md`, repository evidence, or explicit user direction.
 - Preserve authentication, authorization, validation, security boundaries, type safety, runtime safety, error handling, and tests.
 - Treat uploaded photos, detected faces, generated ID photos, embeddings, metadata, logs, and model outputs as personal or sensitive data unless a future policy states otherwise.
@@ -70,4 +75,4 @@
 
 ## Skill Entrypoint
 
-Use `.agents/skills/project-harness/SKILL.md` for substantial product or engineering work. Use `PRD.md` as the product baseline.
+Use `.agents/skills/project-harness/SKILL.md` for substantial product or engineering work. Use root `PRD.md` as product context when it exists.

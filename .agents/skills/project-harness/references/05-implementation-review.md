@@ -7,7 +7,7 @@ Review the completed implementation before declaring it ready or tested.
 - The implementation matches the approved plan and confirmed scope.
 - Any plan divergence was recorded and approved through an updated plan.
 - The change is limited to the requested scope.
-- The implementation remains aligned with `PRD.md`.
+- The implementation remains aligned with existing `PRD.md` when present.
 - Existing language, runtime, module, app-shape, error handling, validation, security, and compatibility patterns are preserved.
 - Public APIs, exported interfaces, request/response contracts, schemas, generated/client types, package metadata, docs, and tests are updated together when connected.
 - Errors are handled explicitly and are not swallowed.
@@ -16,6 +16,7 @@ Review the completed implementation before declaring it ready or tested.
 - No unrelated refactor, dependency, framework, service, data store, or cloud resource was introduced.
 - Security-sensitive changes were reviewed with `security.md`.
 - Language/runtime-sensitive changes were reviewed with `language-runtime.md`.
+- Human-facing review docs outside `.agents/` are in Korean.
 
 ## App Shape Checks
 
