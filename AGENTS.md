@@ -11,7 +11,7 @@
 - Contract documents: `docs/contracts/api.md`, `docs/contracts/ai-service.md`, `docs/contracts/data-model.md`, and `docs/contracts/privacy.md`.
 - App shape: independent project folders are `flutter_app/`, `nestjs_server/`, `python_ai_server/`, and `database/`; cross-project behavior is coordinated through `docs/contracts/` rather than shared application code.
 - Flutter app: `flutter_app/` is a Flutter app named `pick_photo`; source entrypoint is `flutter_app/lib/main.dart`; photo-flow feature files live in `flutter_app/lib/features/photo_flow/`.
-- NestJS server: `nestjs_server/` is a private npm project using NestJS; source entrypoint is `nestjs_server/src/main.ts`; photo API files live in `nestjs_server/src/photos/`; AI adapter lives in `nestjs_server/src/ai/`.
+- NestJS server: `nestjs_server/` is a private npm project using NestJS; source entrypoint is `nestjs_server/src/main.ts`; photo API files live in `nestjs_server/src/photos/`; AI adapter lives in `nestjs_server/src/ai/`; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
 - Python AI server: `python_ai_server/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `python_ai_server/app/main.py`; deterministic fake AI behavior lives in `python_ai_server/app/fake_ai.py`.
 - Database assets: `database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `database/seeds/README.md` reserves the seed workflow. No migration runner or local PostgreSQL server command is verified yet.
 - Languages and runtimes:
