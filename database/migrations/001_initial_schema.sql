@@ -34,6 +34,7 @@ CREATE TABLE detected_faces (
   preview_storage_key text,
   status workflow_status NOT NULL DEFAULT 'succeeded',
   created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (id, photo_upload_id),
   UNIQUE (photo_upload_id, face_index)
 );
 
@@ -46,13 +47,21 @@ CREATE TABLE generation_jobs (
   error_message text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
-  completed_at timestamptz
+  completed_at timestamptz,
+  UNIQUE (id, photo_upload_id)
 );
 
 CREATE TABLE generation_job_faces (
-  generation_job_id uuid NOT NULL REFERENCES generation_jobs(id) ON DELETE CASCADE,
-  detected_face_id uuid NOT NULL REFERENCES detected_faces(id) ON DELETE CASCADE,
-  PRIMARY KEY (generation_job_id, detected_face_id)
+  generation_job_id uuid NOT NULL,
+  detected_face_id uuid NOT NULL,
+  photo_upload_id uuid NOT NULL,
+  PRIMARY KEY (generation_job_id, detected_face_id),
+  FOREIGN KEY (generation_job_id, photo_upload_id)
+    REFERENCES generation_jobs(id, photo_upload_id)
+    ON DELETE CASCADE,
+  FOREIGN KEY (detected_face_id, photo_upload_id)
+    REFERENCES detected_faces(id, photo_upload_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE generated_photos (
@@ -66,7 +75,10 @@ CREATE TABLE generated_photos (
   byte_size bigint NOT NULL CHECK (byte_size > 0),
   status workflow_status NOT NULL DEFAULT 'succeeded',
   created_at timestamptz NOT NULL DEFAULT now(),
-  deleted_at timestamptz
+  deleted_at timestamptz,
+  FOREIGN KEY (generation_job_id, detected_face_id)
+    REFERENCES generation_job_faces(generation_job_id, detected_face_id)
+    ON DELETE CASCADE
 );
 
 CREATE INDEX idx_detected_faces_upload_id ON detected_faces(photo_upload_id);
