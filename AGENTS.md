@@ -4,30 +4,44 @@
 
 - Repository root: `/Users/leejinwoo/mine/pick-photo`.
 - Repository state at harness creation: no repository-local source files, product docs, project metadata, lockfiles, toolchain config, env examples, Docker files, CI workflows, or VCS metadata were present.
-- Product reference: `PRD.md` is the product intent and requirements baseline for future work.
+- Product reference: `PRD.md` is the product/service description baseline. It describes what the service is, who it serves, and product requirements. Do not add technical implementation details to `PRD.md`.
 - Canonical local harness path: `.agents/skills/project-harness/SKILL.md`.
 - System design document: `docs/superpowers/specs/2026-04-28-pick-photo-system-design.md`.
 - Implementation plan documents: `docs/superpowers/plans/2026-04-28-pick-photo-master.md`, `docs/superpowers/plans/2026-04-28-pick-photo-flutter-app.md`, `docs/superpowers/plans/2026-04-28-pick-photo-nestjs-server.md`, `docs/superpowers/plans/2026-04-28-pick-photo-python-ai-server.md`, and `docs/superpowers/plans/2026-04-28-pick-photo-database.md`.
-- Languages and runtimes: Decision needed. No repository-local project files currently verify Flutter/Dart, Node.js/NestJS, Python, PostgreSQL tooling, package managers, framework versions, test runners, linters, formatters, or build tools.
-- App shape: Decision needed. The intended shape is a multi-project system, but no repository-local app folders or entrypoints exist yet.
-- Verified validation commands: No verified test command found.
+- Contract documents: `docs/contracts/api.md`, `docs/contracts/ai-service.md`, `docs/contracts/data-model.md`, and `docs/contracts/privacy.md`.
+- App shape: independent project folders are `flutter_app/`, `nestjs_server/`, `python_ai_server/`, and `database/`; cross-project behavior is coordinated through `docs/contracts/` rather than shared application code.
+- Flutter app: `flutter_app/` is a Flutter app named `pick_photo`; source entrypoint is `flutter_app/lib/main.dart`; photo-flow feature files live in `flutter_app/lib/features/photo_flow/`.
+- NestJS server: `nestjs_server/` is a private npm project using NestJS; source entrypoint is `nestjs_server/src/main.ts`; photo API files live in `nestjs_server/src/photos/`; AI adapter lives in `nestjs_server/src/ai/`.
+- Python AI server: `python_ai_server/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `python_ai_server/app/main.py`; deterministic fake AI behavior lives in `python_ai_server/app/fake_ai.py`.
+- Database assets: `database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `database/seeds/README.md` reserves the seed workflow. No migration runner or local PostgreSQL server command is verified yet.
+- Languages and runtimes:
+  - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `flutter_app/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
+  - Node.js v22.20.0 and npm 10.9.3 are verified locally; `nestjs_server/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
+  - Python 3.12.12 is verified at `/opt/homebrew/bin/python3.12`; `python_ai_server/pyproject.toml` requires Python `>=3.11`.
+- Verified validation commands:
+  - `cd python_ai_server && .venv/bin/python -m pytest -q`
+  - `cd nestjs_server && npm test`
+  - `cd nestjs_server && npm run test:e2e`
+  - `cd nestjs_server && npm run build`
+  - `cd flutter_app && mise x flutter@3.22.1-stable -- flutter test`
+  - `cd flutter_app && mise x flutter@3.22.1-stable -- dart format lib test`
 
 ## Product Reference
 
 - Read `PRD.md` before all product or engineering work.
 - Treat `PRD.md` as the baseline for product intent, users, requirements, scope, and open product decisions.
+- Keep `PRD.md` product-only. Do not add runtime choices, architecture, API contracts, database schema, package metadata, commands, deployment notes, or other technical implementation details.
 - Do not treat unresolved PRD decisions as verified repository facts.
-- When implementation creates or changes product behavior, API behavior, data models, configuration, security boundaries, setup steps, or validation commands, update `PRD.md` and this file as needed.
+- When implementation creates or changes product behavior, check whether `PRD.md` needs a product-level update. Put technical facts, commands, architecture, API behavior, data models, configuration, and security boundaries in `AGENTS.md`, `docs/contracts/`, or implementation plans instead.
 
 ## Project Decisions To Define
 
-- Decision needed: repository initialization policy, branch strategy, CI policy, and code ownership boundaries.
-- Decision needed: exact independent project folder names for the Flutter app, NestJS server, Python AI server, database assets, infrastructure, and shared documentation.
-- Decision needed: package managers and runtime versions for Dart/Flutter, Node.js/NestJS, Python, and PostgreSQL tooling.
-- Decision needed: NestJS API contract, authentication policy, upload policy, job orchestration, storage strategy, data retention policy, and error model.
-- Decision needed: Python AI service model stack, face detection/selection pipeline, ID photo generation pipeline, model artifact storage, inference hardware expectations, and service interface.
-- Decision needed: PostgreSQL schema, migration tool, ORM or query layer, transaction policy, and seed/fixture workflow.
-- Decision needed: local development, testing, build, lint, formatting, e2e, Docker, deployment, observability, and operations commands.
+- Decision needed: CI policy, code ownership boundaries, branch protection, merge policy, and release workflow.
+- Decision needed: infrastructure folder shape, deployment target, environment variable policy, secrets management, observability, and operations commands.
+- Decision needed: authentication policy, real upload storage, real job orchestration, production data retention policy, and production error model.
+- Decision needed: Python AI model stack, production face detection/selection pipeline, production ID-photo generation pipeline, model artifact storage, and inference hardware expectations.
+- Decision needed: PostgreSQL migration runner, ORM or query layer, transaction policy, seed/fixture workflow, and local PostgreSQL validation command.
+- Decision needed: local development commands beyond the verified validation commands, lint coverage policy, Docker, deployment, observability, and operations commands.
 - Decision needed: privacy, consent, personal data handling, image retention, deletion, logging redaction, and compliance requirements for uploaded photos and generated ID photos.
 
 ## Always-On Rules
@@ -48,9 +62,11 @@
 - Do not invent product requirements that are absent from `PRD.md`, repository evidence, or explicit user direction.
 - Preserve authentication, authorization, validation, security boundaries, type safety, runtime safety, error handling, and tests.
 - Treat uploaded photos, detected faces, generated ID photos, embeddings, metadata, logs, and model outputs as personal or sensitive data unless a future policy states otherwise.
-- Use only verified repository commands for testing or validation. If none are verified, report `No verified test command found`.
+- Use only verified repository commands for testing or validation. If a relevant project lacks a verified command, report that gap explicitly.
 - Do not treat commands listed in `Project decisions to define` as verified while they are unresolved, stale, conflicting, missing, `Decision needed`, or `To be defined`.
-- When changing product behavior, user-facing behavior, APIs, configuration behavior, workflows, requirements, or scope, check whether `PRD.md` must be updated.
+- When changing product behavior, user-facing behavior, requirements, or scope, check whether `PRD.md` needs a product-only update. Keep technical updates out of `PRD.md`.
+- Generated/cache artifacts such as Python virtualenvs, `__pycache__`, Node `node_modules`, NestJS `dist`, Flutter `.dart_tool`, Flutter `build`, and local platform files must remain untracked.
+- Flutter Android build is not yet verified. Flutter scaffold generation emitted a Java 21 / Gradle 7.6.3 compatibility warning; treat Android build compatibility as a later task.
 
 ## Skill Entrypoint
 
