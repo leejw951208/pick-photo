@@ -5,11 +5,12 @@
 ## 진행 현황 (2026-04-28)
 
 - 완료: Python 프로젝트 메타데이터, FastAPI 엔드포인트, Pydantic 계약 스키마, deterministic fake 얼굴 인식/증명사진 생성 동작, AI 계약 테스트.
-- 남은 작업: 실제 모델 기반 얼굴 인식/증명사진 생성 파이프라인, 모델 산출물 저장 위치, 임시 파일 정리 정책의 실제 실행.
+- 완료: OpenCV/Pillow 기반 로컬 얼굴 감지와 413x531 JPEG 생성, `PICK_PHOTO_AI_STORAGE_DIR` storage root, storage key traversal 방어, `PICK_PHOTO_AI_MODE=fake` fallback.
+- 남은 작업: 운영 품질 모델 stack 선택, model artifact 저장/배포 방식, 생성 결과 cleanup/retention 실행, 품질 기준과 공식 규격 지원 여부 결정.
 
-**Goal:** Build an internal Python AI service contract for face detection and ID-photo generation, starting with deterministic fake behavior before real model integration.
+**Goal:** Build an internal Python AI service contract for face detection and ID-photo generation, starting with deterministic fake behavior and then extending it with local image processing before production model integration.
 
-**Architecture:** Keep the AI service isolated in `apps/ai/`. The first vertical slice returns deterministic responses so the NestJS server and Flutter app can integrate without waiting for model selection.
+**Architecture:** Keep the AI service isolated in `apps/ai/`. The first vertical slice returned deterministic responses so the NestJS server and Flutter app could integrate without waiting for model selection. The current default uses local OpenCV/Pillow processing while preserving fake mode for deterministic tests and fallback.
 
 **Tech Stack:** Python HTTP service. Recommended first implementation uses FastAPI and pytest unless the implementation session selects different repository-local tooling before scaffolding.
 
@@ -21,7 +22,11 @@
 - Create: `apps/ai/app/main.py`
 - Create: `apps/ai/app/schemas.py`
 - Create: `apps/ai/app/fake_ai.py`
+- Create: `apps/ai/app/local_ai.py`
+- Create: `apps/ai/app/storage.py`
 - Create: `apps/ai/tests/test_ai_contract.py`
+- Create: `apps/ai/tests/test_local_ai.py`
+- Create: `apps/ai/tests/test_storage.py`
 - Modify: `docs/contracts/ai-service.md`
 
 ### Task 1: Scaffold Python Service Metadata

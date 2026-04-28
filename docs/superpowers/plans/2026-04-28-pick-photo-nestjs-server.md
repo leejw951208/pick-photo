@@ -6,7 +6,8 @@
 
 - 완료: NestJS 프로젝트 생성, 사진 업로드 API, 얼굴 목록 API, 생성 요청 API, 생성 결과 API, Swagger 문서, fake AI 기반 in-memory 워크플로.
 - 완료: 업로드 파일 로컬 저장소, PostgreSQL 저장소 어댑터, Python AI 서버 HTTP 어댑터.
-- 남은 작업: 실제 AI 모델 결과 저장, 결과 이미지 제공/다운로드, 보관/삭제 정책 실행, 로컬 PostgreSQL 검증 명령 확정.
+- 현재 연결 상태: `AI_SERVICE_BASE_URL` 설정 시 Python AI 서버의 로컬 OpenCV/Pillow 결과 metadata를 받아 generation record에 저장한다.
+- 남은 작업: `/results/...` result URL이 실제 파일 byte를 제공하도록 image serving/download 구현, backend storage root와 AI storage root 운영 설정 정리, 보관/삭제 정책 실행, 로컬 PostgreSQL 검증 명령 확정.
 
 **Goal:** Build the application server that owns public workflow APIs and coordinates upload, face detection, selection, generation, persistence, and AI service calls.
 

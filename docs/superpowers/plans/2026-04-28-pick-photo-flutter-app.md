@@ -5,7 +5,7 @@
 ## 진행 현황 (2026-04-28)
 
 - 완료: Flutter 앱 scaffold, 사진 선택/업로드 API 경계, NestJS API 클라이언트, fake 클라이언트, 업로드/얼굴 검토/단일 또는 전체 얼굴 생성 요청/결과 목록 표시 흐름, 상태/API/위젯 테스트.
-- 남은 작업: 실제 결과 이미지 미리보기/저장 UX, 개인정보 동의와 보관/삭제 안내 UX, 모바일 화면 품질 보강, Android 빌드 검증.
+- 남은 작업: NestJS가 `/results/...` 파일 byte를 제공한 뒤 실제 결과 이미지 미리보기/저장 UX 구현, 개인정보 동의와 보관/삭제 안내 UX, 모바일 화면 품질 보강, Android 빌드 검증.
 
 **Goal:** Build the first Flutter user flow for uploading a photo, reviewing detected faces, selecting one or all faces, generating ID-photo style results, and displaying outcomes.
 
