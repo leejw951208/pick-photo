@@ -13,6 +13,14 @@ Defines the contract between the Flutter app and the NestJS server.
 - `generation_failed`
 - `result_unavailable`
 
+## Workflow Status Values
+
+- `pending`
+- `processing`
+- `succeeded`
+- `failed`
+- `deleted`
+
 ## Endpoints
 
 ### `POST /photos/uploads`
@@ -26,7 +34,7 @@ Request:
 Response fields:
 
 - `uploadId`: string identifier for the upload.
-- `status`: workflow status.
+- `status`: one of the workflow status values.
 
 ### `GET /photos/uploads/:uploadId/faces`
 
@@ -66,12 +74,12 @@ Path fields:
 Request fields:
 
 - `selectionMode`: one of `single_face` or `all_faces`.
-- `faceId`: optional string identifier for the selected face.
+- `faceId`: optional string identifier for the selected face; required when `selectionMode` is `single_face`.
 
 Response fields:
 
 - `generationId`: string identifier for the generation.
-- `status`: workflow status.
+- `status`: one of the workflow status values.
 
 ### `GET /photos/generations/:generationId`
 
@@ -84,7 +92,7 @@ Path fields:
 Response fields:
 
 - `generationId`: string identifier for the generation.
-- `status`: workflow status.
+- `status`: one of the workflow status values.
 - `results`: array of generated photo result objects.
 - `errorCategory`: optional stable error category.
 
