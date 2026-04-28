@@ -32,13 +32,15 @@ class GeneratedPhoto {
 }
 
 class PhotoFlowState {
-  const PhotoFlowState({
+  PhotoFlowState({
     required this.stage,
-    required this.faces,
-    required this.selectedFaceIds,
-    required this.results,
+    required List<DetectedFace> faces,
+    required Set<String> selectedFaceIds,
+    required List<GeneratedPhoto> results,
     this.message,
-  });
+  })  : faces = List.unmodifiable(faces),
+        selectedFaceIds = Set.unmodifiable(selectedFaceIds),
+        results = List.unmodifiable(results);
 
   const PhotoFlowState.initial()
       : stage = PhotoFlowStage.waitingForUpload,
@@ -59,13 +61,14 @@ class PhotoFlowState {
     Set<String>? selectedFaceIds,
     List<GeneratedPhoto>? results,
     String? message,
+    bool clearMessage = false,
   }) {
     return PhotoFlowState(
       stage: stage ?? this.stage,
       faces: faces ?? this.faces,
       selectedFaceIds: selectedFaceIds ?? this.selectedFaceIds,
       results: results ?? this.results,
-      message: message ?? this.message,
+      message: clearMessage ? null : message ?? this.message,
     );
   }
 }
