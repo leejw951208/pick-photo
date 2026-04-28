@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { FakeAiClient } from '../ai/ai-client';
 import {
   CreateGenerationRequestDto,
@@ -30,9 +30,14 @@ export class PhotosService {
 
   async createGeneration(uploadId: string, request: CreateGenerationRequestDto): Promise<CreateGenerationResponseDto> {
     const upload = this.uploads.get(uploadId);
-    const faces = upload?.faces ?? [];
-    const selectedFaces =
-      request.selectionMode === 'all_faces' ? faces : faces.filter((face) => face.id === request.faceId);
+    if (!upload) {
+      throw new NotFoundException({
+        message: 'Upload was not found.',
+        errorCategory: 'result_unavailable',
+      });
+    }
+
+    const selectedFaces = this.resolveSelectedFaces(upload.faces, request);
 
     const generationId = `generation-${this.generations.size + 1}`;
     const results: GenerationStatusResponseDto['results'] = [];
@@ -41,7 +46,7 @@ export class PhotosService {
       const result = await this.aiClient.generateIdPhoto({
         uploadId,
         faceId: face.id,
-        sourceStorageKey: upload?.storageKey ?? '',
+        sourceStorageKey: upload.storageKey,
         box: face.box,
       });
       results.push({
@@ -70,5 +75,38 @@ export class PhotosService {
         errorCategory: 'result_unavailable',
       }
     );
+  }
+
+  private resolveSelectedFaces(
+    faces: DetectedFaceDto[],
+    request: CreateGenerationRequestDto,
+  ): DetectedFaceDto[] {
+    if (request.selectionMode !== 'single_face' && request.selectionMode !== 'all_faces') {
+      throw new BadRequestException({
+        message: 'selectionMode must be single_face or all_faces.',
+        errorCategory: 'selection_invalid',
+      });
+    }
+
+    if (request.selectionMode === 'all_faces') {
+      return faces;
+    }
+
+    if (!request.faceId) {
+      throw new BadRequestException({
+        message: 'faceId is required when selectionMode is single_face.',
+        errorCategory: 'selection_invalid',
+      });
+    }
+
+    const selectedFace = faces.find((face) => face.id === request.faceId);
+    if (!selectedFace) {
+      throw new BadRequestException({
+        message: 'faceId does not belong to the upload.',
+        errorCategory: 'selection_invalid',
+      });
+    }
+
+    return [selectedFace];
   }
 }
