@@ -26,7 +26,26 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
       );
     });
 
-    final faces = await widget.api.uploadAndDetectFaces(path);
+    final List<DetectedFace> faces;
+    try {
+      faces = await widget.api.uploadAndDetectFaces(path);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        state = state.copyWith(
+          stage: PhotoFlowStage.failed,
+          faces: const [],
+          selectedFaceIds: const {},
+          results: const [],
+          message: 'Upload failed. Try again',
+        );
+      });
+      return;
+    }
+
     if (!mounted) {
       return;
     }
@@ -60,7 +79,24 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
       );
     });
 
-    final results = await widget.api.generateForFaces(faceIds);
+    final List<GeneratedPhoto> results;
+    try {
+      results = await widget.api.generateForFaces(faceIds);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        state = state.copyWith(
+          stage: PhotoFlowStage.failed,
+          results: const [],
+          message: 'Generation failed. Try again',
+        );
+      });
+      return;
+    }
+
     if (!mounted) {
       return;
     }

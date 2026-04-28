@@ -29,6 +29,21 @@ void main() {
     expect(find.text('Generate all faces'), findsNothing);
   });
 
+  testWidgets('shows retryable failure message when upload throws',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(home: PhotoFlowScreen(api: FailingUploadPhotoFlowApi())),
+    );
+
+    await tester.tap(find.text('Upload sample photo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Upload failed. Try again'), findsOneWidget);
+    expect(find.text('Face 1'), findsNothing);
+    expect(find.text('Generate all faces'), findsNothing);
+    expect(find.textContaining('Generated result'), findsNothing);
+  });
+
   testWidgets('shows generated result after selecting a face', (tester) async {
     await tester.pumpWidget(
       MaterialApp(home: PhotoFlowScreen(api: FakePhotoFlowApi())),
@@ -45,6 +60,22 @@ void main() {
       find.text('https://example.invalid/results/face-1.jpg'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('shows retryable failure message when generation throws',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(home: PhotoFlowScreen(api: FailingGenerationPhotoFlowApi())),
+    );
+
+    await tester.tap(find.text('Upload sample photo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Face 1'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Generation failed. Try again'), findsOneWidget);
+    expect(find.text('Face 1'), findsOneWidget);
+    expect(find.textContaining('Generated result'), findsNothing);
   });
 
   testWidgets('generates results for all detected faces', (tester) async {
@@ -69,6 +100,32 @@ void main() {
     expect(find.text('https://example.invalid/results/face-2.jpg'),
         findsOneWidget);
   });
+}
+
+class FailingUploadPhotoFlowApi implements PhotoFlowApi {
+  @override
+  Future<List<DetectedFace>> uploadAndDetectFaces(String localPhotoPath) async {
+    throw StateError('upload failed');
+  }
+
+  @override
+  Future<List<GeneratedPhoto>> generateForFaces(Set<String> faceIds) async {
+    return const [];
+  }
+}
+
+class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
+  @override
+  Future<List<DetectedFace>> uploadAndDetectFaces(String localPhotoPath) async {
+    return const [
+      DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98),
+    ];
+  }
+
+  @override
+  Future<List<GeneratedPhoto>> generateForFaces(Set<String> faceIds) async {
+    throw StateError('generation failed');
+  }
 }
 
 class MultiFacePhotoFlowApi implements PhotoFlowApi {
