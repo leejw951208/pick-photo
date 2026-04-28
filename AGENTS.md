@@ -3,29 +3,29 @@
 ## Repository Facts
 
 - Repository root: `/Users/leejinwoo/mine/pick-photo`.
-- Git repository: current branch `main`; `origin` is `https://github.com/leejw951208/pick-photo.git`; latest observed commit is `3139be4 앱: 실제 사진 업로드 연결`.
+- Git repository: current branch `main`; `origin` is `https://github.com/leejw951208/pick-photo.git`.
 - Repository state at original harness creation: no repository-local source files, product docs, project metadata, lockfiles, toolchain config, env examples, Docker files, CI workflows, or VCS metadata were present.
 - Product reference: `PRD.md` is the Korean product requirements baseline. It describes what the service is, who it serves, product requirements, acceptance criteria, assumptions, and open product questions. Do not add technical implementation details to `PRD.md`.
 - Canonical local harness path: `.agents/skills/project-harness/SKILL.md`.
 - System design document: `docs/superpowers/specs/2026-04-28-pick-photo-system-design.md`.
 - Implementation plan documents: `docs/superpowers/plans/2026-04-28-pick-photo-master.md`, `docs/superpowers/plans/2026-04-28-pick-photo-flutter-app.md`, `docs/superpowers/plans/2026-04-28-pick-photo-nestjs-server.md`, `docs/superpowers/plans/2026-04-28-pick-photo-python-ai-server.md`, and `docs/superpowers/plans/2026-04-28-pick-photo-database.md`.
 - Contract documents: `docs/contracts/api.md`, `docs/contracts/ai-service.md`, `docs/contracts/data-model.md`, and `docs/contracts/privacy.md`.
-- App shape: independent project folders are `flutter_app/`, `nestjs_server/`, `python_ai_server/`, and `database/`; cross-project behavior is coordinated through `docs/contracts/` rather than shared application code.
-- Flutter app: `flutter_app/` is a Flutter app named `pick_photo`; source entrypoint is `flutter_app/lib/main.dart`; photo-flow feature files live in `flutter_app/lib/features/photo_flow/`; the app uses a file picker and `NestPhotoFlowApi` to upload selected photos to `http://localhost:3000` by default, configurable with `PICK_PHOTO_API_BASE_URL`.
-- NestJS server: `nestjs_server/` is a private npm project using NestJS; source entrypoint is `nestjs_server/src/main.ts`; photo API files live in `nestjs_server/src/photos/`; AI adapter lives in `nestjs_server/src/ai/`; local CORS is enabled; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
-- Python AI server: `python_ai_server/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `python_ai_server/app/main.py`; deterministic fake AI behavior lives in `python_ai_server/app/fake_ai.py`.
+- App shape: independent project folders are `apps/mobile/`, `apps/backend/`, `apps/ai/`, and `database/`; cross-project behavior is coordinated through `docs/contracts/` rather than shared application code.
+- Flutter app: `apps/mobile/` is a Flutter app named `pick_photo`; source entrypoint is `apps/mobile/lib/main.dart`; photo-flow feature files live in `apps/mobile/lib/features/photo_flow/`; the app uses a file picker and `NestPhotoFlowApi` to upload selected photos to `http://localhost:3000` by default, configurable with `PICK_PHOTO_API_BASE_URL`.
+- NestJS server: `apps/backend/` is a private npm project using NestJS; source entrypoint is `apps/backend/src/main.ts`; photo API files live in `apps/backend/src/photos/`; AI adapter lives in `apps/backend/src/ai/`; local CORS is enabled; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
+- Python AI server: `apps/ai/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `apps/ai/app/main.py`; deterministic fake AI behavior lives in `apps/ai/app/fake_ai.py`.
 - Database assets: `database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `database/seeds/README.md` reserves the seed workflow. No migration runner or local PostgreSQL server command is verified yet.
 - Languages and runtimes:
-  - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `flutter_app/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
-  - Node.js v22.20.0 and npm 10.9.3 are verified locally; `nestjs_server/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
-  - Python 3.12.12 is verified at `/opt/homebrew/bin/python3.12`; `python_ai_server/pyproject.toml` requires Python `>=3.11`.
+  - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `apps/mobile/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
+  - Node.js v22.20.0 and npm 10.9.3 are verified locally; `apps/backend/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
+  - Python 3.12.12 is verified at `/opt/homebrew/bin/python3.12`; `apps/ai/pyproject.toml` requires Python `>=3.11`.
 - Verified validation commands:
-  - `cd python_ai_server && .venv/bin/python -m pytest -q`
-  - `cd nestjs_server && npm test`
-  - `cd nestjs_server && npm run test:e2e`
-  - `cd nestjs_server && npm run build`
-  - `cd flutter_app && mise x flutter@3.22.1-stable -- flutter test`
-  - `cd flutter_app && mise x flutter@3.22.1-stable -- dart format lib test`
+  - `cd apps/ai && .venv/bin/python -m pytest -q`
+  - `cd apps/backend && npm test`
+  - `cd apps/backend && npm run test:e2e`
+  - `cd apps/backend && npm run build`
+  - `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`
+  - `cd apps/mobile && mise x flutter@3.22.1-stable -- dart format lib test`
 
 ## Product Reference
 

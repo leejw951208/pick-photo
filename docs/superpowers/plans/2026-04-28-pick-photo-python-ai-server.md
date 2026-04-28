@@ -4,7 +4,7 @@
 
 **Goal:** Build an internal Python AI service contract for face detection and ID-photo generation, starting with deterministic fake behavior before real model integration.
 
-**Architecture:** Keep the AI service isolated in `python_ai_server/`. The first vertical slice returns deterministic responses so the NestJS server and Flutter app can integrate without waiting for model selection.
+**Architecture:** Keep the AI service isolated in `apps/ai/`. The first vertical slice returns deterministic responses so the NestJS server and Flutter app can integrate without waiting for model selection.
 
 **Tech Stack:** Python HTTP service. Recommended first implementation uses FastAPI and pytest unless the implementation session selects different repository-local tooling before scaffolding.
 
@@ -12,17 +12,17 @@
 
 ## File Structure
 
-- Create: `python_ai_server/pyproject.toml`
-- Create: `python_ai_server/app/main.py`
-- Create: `python_ai_server/app/schemas.py`
-- Create: `python_ai_server/app/fake_ai.py`
-- Create: `python_ai_server/tests/test_ai_contract.py`
+- Create: `apps/ai/pyproject.toml`
+- Create: `apps/ai/app/main.py`
+- Create: `apps/ai/app/schemas.py`
+- Create: `apps/ai/app/fake_ai.py`
+- Create: `apps/ai/tests/test_ai_contract.py`
 - Modify: `docs/contracts/ai-service.md`
 
 ### Task 1: Scaffold Python Service Metadata
 
 **Files:**
-- Create: `python_ai_server/pyproject.toml`
+- Create: `apps/ai/pyproject.toml`
 
 - [ ] **Step 1: Create Python project metadata**
 
@@ -54,7 +54,7 @@ pythonpath = ["."]
 Run after Python tooling is available:
 
 ```bash
-cd python_ai_server
+cd apps/ai
 python -m pip install -e ".[dev]"
 ```
 
@@ -63,8 +63,8 @@ Expected: packages install without errors.
 ### Task 2: Define AI Contract Schemas
 
 **Files:**
-- Create: `python_ai_server/app/schemas.py`
-- Test: `python_ai_server/tests/test_ai_contract.py`
+- Create: `apps/ai/app/schemas.py`
+- Test: `apps/ai/tests/test_ai_contract.py`
 
 - [ ] **Step 1: Write schema tests**
 
@@ -142,7 +142,7 @@ class GenerateIdPhotoResponse(BaseModel):
 Run:
 
 ```bash
-cd python_ai_server
+cd apps/ai
 pytest tests/test_ai_contract.py -q
 ```
 
@@ -151,8 +151,8 @@ Expected: both tests pass after dependencies are installed.
 ### Task 3: Implement Deterministic Fake AI Behavior
 
 **Files:**
-- Create: `python_ai_server/app/fake_ai.py`
-- Modify: `python_ai_server/tests/test_ai_contract.py`
+- Create: `apps/ai/app/fake_ai.py`
+- Modify: `apps/ai/tests/test_ai_contract.py`
 
 - [ ] **Step 1: Add fake AI tests**
 
@@ -232,7 +232,7 @@ def generate_id_photo(request: GenerateIdPhotoRequest) -> GenerateIdPhotoRespons
 ### Task 4: Expose HTTP Endpoints
 
 **Files:**
-- Create: `python_ai_server/app/main.py`
+- Create: `apps/ai/app/main.py`
 
 - [ ] **Step 1: Implement FastAPI app**
 
@@ -266,7 +266,7 @@ def post_generate_id_photo(request: GenerateIdPhotoRequest) -> GenerateIdPhotoRe
 Run:
 
 ```bash
-cd python_ai_server
+cd apps/ai
 pytest -q
 ```
 
@@ -279,7 +279,7 @@ Expected: all Python AI tests pass.
 
 - [ ] **Step 1: Document request and response fields**
 
-Add the schema field names from `python_ai_server/app/schemas.py` under each operation in `docs/contracts/ai-service.md`.
+Add the schema field names from `apps/ai/app/schemas.py` under each operation in `docs/contracts/ai-service.md`.
 
 ## Plan Self-Review
 

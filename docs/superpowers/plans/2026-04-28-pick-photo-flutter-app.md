@@ -4,7 +4,7 @@
 
 **Goal:** Build the first Flutter user flow for uploading a photo, reviewing detected faces, selecting one or all faces, generating ID-photo style results, and displaying outcomes.
 
-**Architecture:** Keep the app isolated in `flutter_app/`. Use a small feature module for the photo workflow and call only the NestJS application API.
+**Architecture:** Keep the app isolated in `apps/mobile/`. Use a small feature module for the photo workflow and call only the NestJS application API.
 
 **Tech Stack:** Flutter and Dart. Exact Flutter/Dart versions must be recorded from generated project metadata after scaffolding.
 
@@ -12,35 +12,35 @@
 
 ## File Structure
 
-- Create: `flutter_app/` using Flutter project scaffolding.
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_state.dart`
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_api.dart`
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_screen.dart`
-- Modify: `flutter_app/lib/main.dart`
-- Test: `flutter_app/test/photo_flow_state_test.dart`
-- Test: `flutter_app/test/photo_flow_screen_test.dart`
+- Create: `apps/mobile/` using Flutter project scaffolding.
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_state.dart`
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_api.dart`
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_screen.dart`
+- Modify: `apps/mobile/lib/main.dart`
+- Test: `apps/mobile/test/photo_flow_state_test.dart`
+- Test: `apps/mobile/test/photo_flow_screen_test.dart`
 
 ### Task 1: Scaffold Flutter App
 
 **Files:**
-- Create: `flutter_app/`
+- Create: `apps/mobile/`
 
 - [ ] **Step 1: Generate project**
 
 Run after Flutter tooling is available:
 
 ```bash
-flutter create --org com.pickphoto --project-name pick_photo flutter_app
+flutter create --org com.pickphoto --project-name pick_photo apps/mobile
 ```
 
-Expected: Flutter project files are created under `flutter_app/`.
+Expected: Flutter project files are created under `apps/mobile/`.
 
 - [ ] **Step 2: Run generated tests**
 
 Run:
 
 ```bash
-cd flutter_app
+cd apps/mobile
 flutter test
 ```
 
@@ -49,8 +49,8 @@ Expected: generated Flutter tests pass.
 ### Task 2: Define Photo Flow State
 
 **Files:**
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_state.dart`
-- Test: `flutter_app/test/photo_flow_state_test.dart`
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_state.dart`
+- Test: `apps/mobile/test/photo_flow_state_test.dart`
 
 - [ ] **Step 1: Write state tests**
 
@@ -158,7 +158,7 @@ class PhotoFlowState {
 ### Task 3: Create API Boundary
 
 **Files:**
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_api.dart`
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_api.dart`
 
 - [ ] **Step 1: Implement client interface and fake client**
 
@@ -200,9 +200,9 @@ class FakePhotoFlowApi implements PhotoFlowApi {
 ### Task 4: Build First Flow Screen
 
 **Files:**
-- Create: `flutter_app/lib/features/photo_flow/photo_flow_screen.dart`
-- Modify: `flutter_app/lib/main.dart`
-- Test: `flutter_app/test/photo_flow_screen_test.dart`
+- Create: `apps/mobile/lib/features/photo_flow/photo_flow_screen.dart`
+- Modify: `apps/mobile/lib/main.dart`
+- Test: `apps/mobile/test/photo_flow_screen_test.dart`
 
 - [ ] **Step 1: Implement screen**
 
@@ -344,7 +344,7 @@ void main() {
 Run:
 
 ```bash
-cd flutter_app
+cd apps/mobile
 flutter test
 ```
 

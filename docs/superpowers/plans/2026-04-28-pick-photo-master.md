@@ -27,9 +27,9 @@
 - Create: `docs/contracts/ai-service.md` for NestJS-to-Python AI contracts.
 - Create: `docs/contracts/data-model.md` for entity and status definitions.
 - Create: `docs/contracts/privacy.md` for sensitive photo handling rules.
-- Create: `flutter_app/` through the Flutter plan.
-- Create: `nestjs_server/` through the NestJS plan.
-- Create: `python_ai_server/` through the Python AI plan.
+- Create: `apps/mobile/` through the Flutter plan.
+- Create: `apps/backend/` through the NestJS plan.
+- Create: `apps/ai/` through the Python AI plan.
 - Create: `database/` through the database plan.
 - Modify: `AGENTS.md` after each project exists to record verified commands and decisions.
 

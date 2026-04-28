@@ -12,9 +12,9 @@ The product definition lives in `PRD.md`. This design document may discuss imple
 
 Use independent project folders at the repository root:
 
-- `flutter_app/`: Flutter client application.
-- `nestjs_server/`: NestJS application server.
-- `python_ai_server/`: Python AI service.
+- `apps/mobile/`: Flutter client application.
+- `apps/backend/`: NestJS application server.
+- `apps/ai/`: Python AI service.
 - `database/`: PostgreSQL schema, migrations, seeds, and local data notes.
 - `docs/contracts/`: Cross-project contracts that must remain explicit instead of becoming shared code.
 

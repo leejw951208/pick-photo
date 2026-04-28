@@ -4,7 +4,7 @@
 
 **Goal:** Build the application server that owns public workflow APIs and coordinates upload, face detection, selection, generation, persistence, and AI service calls.
 
-**Architecture:** Keep the NestJS server in `nestjs_server/`. The server exposes public API endpoints to the Flutter app and calls the Python AI server through a narrow adapter.
+**Architecture:** Keep the NestJS server in `apps/backend/`. The server exposes public API endpoints to the Flutter app and calls the Python AI server through a narrow adapter.
 
 **Tech Stack:** NestJS with TypeScript. Exact package manager and generated project metadata must be confirmed during scaffolding.
 
@@ -12,36 +12,36 @@
 
 ## File Structure
 
-- Create: `nestjs_server/` using NestJS project scaffolding.
-- Create: `nestjs_server/src/photos/photos.module.ts`
-- Create: `nestjs_server/src/photos/photos.controller.ts`
-- Create: `nestjs_server/src/photos/photos.service.ts`
-- Create: `nestjs_server/src/photos/dto.ts`
-- Create: `nestjs_server/src/ai/ai-client.ts`
-- Create: `nestjs_server/test/photos.e2e-spec.ts`
+- Create: `apps/backend/` using NestJS project scaffolding.
+- Create: `apps/backend/src/photos/photos.module.ts`
+- Create: `apps/backend/src/photos/photos.controller.ts`
+- Create: `apps/backend/src/photos/photos.service.ts`
+- Create: `apps/backend/src/photos/dto.ts`
+- Create: `apps/backend/src/ai/ai-client.ts`
+- Create: `apps/backend/test/photos.e2e-spec.ts`
 - Modify: `docs/contracts/api.md`
 
 ### Task 1: Scaffold NestJS Project
 
 **Files:**
-- Create: `nestjs_server/`
+- Create: `apps/backend/`
 
 - [ ] **Step 1: Generate project**
 
 Run after Node.js tooling is available:
 
 ```bash
-npx @nestjs/cli new nestjs_server --package-manager npm --skip-git
+npx @nestjs/cli new apps/backend --package-manager npm --skip-git
 ```
 
-Expected: NestJS project files are created under `nestjs_server/`.
+Expected: NestJS project files are created under `apps/backend/`.
 
 - [ ] **Step 2: Run generated tests**
 
 Run:
 
 ```bash
-cd nestjs_server
+cd apps/backend
 npm test
 ```
 
@@ -50,7 +50,7 @@ Expected: generated tests pass.
 ### Task 2: Define Workflow DTOs
 
 **Files:**
-- Create: `nestjs_server/src/photos/dto.ts`
+- Create: `apps/backend/src/photos/dto.ts`
 
 - [ ] **Step 1: Create DTO definitions**
 
@@ -114,7 +114,7 @@ export interface GenerationStatusResponseDto {
 ### Task 3: Implement AI Client Adapter
 
 **Files:**
-- Create: `nestjs_server/src/ai/ai-client.ts`
+- Create: `apps/backend/src/ai/ai-client.ts`
 
 - [ ] **Step 1: Create adapter interface and fake implementation**
 
@@ -166,7 +166,7 @@ export class FakeAiClient implements AiClient {
 ### Task 4: Implement In-Memory Workflow Service
 
 **Files:**
-- Create: `nestjs_server/src/photos/photos.service.ts`
+- Create: `apps/backend/src/photos/photos.service.ts`
 
 - [ ] **Step 1: Create service with deterministic in-memory state**
 
@@ -249,9 +249,9 @@ export class PhotosService {
 ### Task 5: Implement Controller and Module
 
 **Files:**
-- Create: `nestjs_server/src/photos/photos.controller.ts`
-- Create: `nestjs_server/src/photos/photos.module.ts`
-- Modify: `nestjs_server/src/app.module.ts`
+- Create: `apps/backend/src/photos/photos.controller.ts`
+- Create: `apps/backend/src/photos/photos.module.ts`
+- Modify: `apps/backend/src/app.module.ts`
 
 - [ ] **Step 1: Create controller**
 
@@ -317,7 +317,7 @@ export class AppModule {}
 ### Task 6: Validate API Contract
 
 **Files:**
-- Test: `nestjs_server/test/photos.e2e-spec.ts`
+- Test: `apps/backend/test/photos.e2e-spec.ts`
 
 - [ ] **Step 1: Add e2e contract test**
 
@@ -373,7 +373,7 @@ describe('Photos workflow', () => {
 Run:
 
 ```bash
-cd nestjs_server
+cd apps/backend
 npm test
 npm run test:e2e
 ```
