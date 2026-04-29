@@ -90,9 +90,6 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
       if (!_isCurrentDecode(generation, photoBytes)) {
         return;
       }
-      if (_imageSize != null) {
-        return;
-      }
       setState(() {
         _imageSize = null;
         _decodeError = error;

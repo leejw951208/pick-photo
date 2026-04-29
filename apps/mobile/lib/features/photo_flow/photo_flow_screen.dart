@@ -116,6 +116,10 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   }
 
   void _toggleFace(String faceId) {
+    if (state.stage == PhotoFlowStage.generating) {
+      return;
+    }
+
     final selectedFaceIds = Set<String>.from(state.selectedFaceIds);
     if (selectedFaceIds.contains(faceId)) {
       selectedFaceIds.remove(faceId);
@@ -132,6 +136,10 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   }
 
   void _selectAllFaces() {
+    if (state.stage == PhotoFlowStage.generating) {
+      return;
+    }
+
     setState(() {
       state = state.copyWith(
         selectedFaceIds: state.faces.map((face) => face.id).toSet(),
@@ -141,6 +149,10 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   }
 
   void _clearSelection() {
+    if (state.stage == PhotoFlowStage.generating) {
+      return;
+    }
+
     setState(() {
       state = state.copyWith(
         selectedFaceIds: const {},
@@ -150,6 +162,10 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   }
 
   Future<void> _generateSelectedFaces() async {
+    if (state.stage == PhotoFlowStage.generating) {
+      return;
+    }
+
     if (state.selectedFaceIds.isEmpty) {
       setState(() {
         state = state.copyWith(message: '생성할 얼굴을 먼저 선택해 주세요');
@@ -280,6 +296,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
                 _SelectionSummary(
                   selectedCount: state.selectedFaceIds.length,
                   totalCount: state.faces.length,
+                  enabled: state.stage != PhotoFlowStage.generating,
                   onSelectAll: _selectAllFaces,
                   onClear: _clearSelection,
                   onGenerate: _generateSelectedFaces,
@@ -296,6 +313,7 @@ class _SelectionSummary extends StatelessWidget {
   const _SelectionSummary({
     required this.selectedCount,
     required this.totalCount,
+    required this.enabled,
     required this.onSelectAll,
     required this.onClear,
     required this.onGenerate,
@@ -303,6 +321,7 @@ class _SelectionSummary extends StatelessWidget {
 
   final int selectedCount;
   final int totalCount;
+  final bool enabled;
   final VoidCallback onSelectAll;
   final VoidCallback onClear;
   final VoidCallback onGenerate;
@@ -321,15 +340,15 @@ class _SelectionSummary extends StatelessWidget {
             runSpacing: 8,
             children: [
               OutlinedButton(
-                onPressed: onSelectAll,
+                onPressed: enabled ? onSelectAll : null,
                 child: const Text('전체 선택'),
               ),
               OutlinedButton(
-                onPressed: onClear,
+                onPressed: enabled ? onClear : null,
                 child: const Text('선택 초기화'),
               ),
               FilledButton(
-                onPressed: onGenerate,
+                onPressed: enabled ? onGenerate : null,
                 child: const Text('선택한 얼굴 생성'),
               ),
             ],

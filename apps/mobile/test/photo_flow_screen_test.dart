@@ -321,6 +321,62 @@ void main() {
     expect(find.text('생성이 완료되었습니다'), findsNothing);
   });
 
+  testWidgets('locks selection controls while generation is pending',
+      (tester) async {
+    final api = ControllablePhotoFlowApi();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: SequencePhotoPicker(['person.jpg']),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pump();
+    api.completeUpload(
+      'person.jpg',
+      const FaceDetectionResult(
+        uploadId: 'upload-1',
+        faces: [
+          DetectedFace(
+            id: 'face-1',
+            faceIndex: 0,
+            box: FaceBox(left: 0.05, top: 0.1, width: 0.25, height: 0.35),
+            confidence: 0.98,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('얼굴 1 제외됨'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
+    await tester.pump();
+
+    await tester.tap(find.text('선택 초기화'), warnIfMissed: false);
+    await tester.pump();
+
+    expect(find.text('선택한 얼굴 1명 / 전체 1명'), findsOneWidget);
+
+    api.completeGeneration(
+      'upload-1',
+      const [
+        GeneratedPhoto(
+          id: 'generated-face-1',
+          faceId: 'face-1',
+          url: 'https://example.invalid/results/face-1.jpg',
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Generated result for face-1'), findsOneWidget);
+    expect(find.text('선택한 얼굴 1명 / 전체 1명'), findsOneWidget);
+  });
+
   testWidgets('keeps canvas zoom when selection changes', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -547,6 +603,36 @@ void main() {
     expect(find.text('사진 미리보기를 표시할 수 없습니다'), findsOneWidget);
     expect(find.text('얼굴 1 제외됨'), findsNothing);
   });
+
+  testWidgets('does not show face markers over undecodable PNG bytes',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 240,
+            child: FaceSelectionCanvas(
+              photoBytes: invalidPngImageBytes(),
+              faces: const [
+                DetectedFace(
+                  id: 'face-1',
+                  faceIndex: 0,
+                  box: FaceBox(left: 0.1, top: 0.1, width: 0.8, height: 0.8),
+                  confidence: 0.98,
+                ),
+              ],
+              selectedFaceIds: const {},
+              onFaceToggled: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await pumpDecodedCanvas(tester);
+
+    expect(find.text('사진 미리보기를 표시할 수 없습니다'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsNothing);
+  });
 }
 
 Future<void> pumpDecodedCanvas(WidgetTester tester) async {
@@ -564,6 +650,14 @@ double canvasScale(WidgetTester tester) {
 
 Uint8List invalidImageBytes() {
   return Uint8List.fromList([1, 2, 3]);
+}
+
+Uint8List invalidPngImageBytes() {
+  final bytes = onePixelPngBytes();
+  bytes[40] = 0;
+  bytes[41] = 0;
+  bytes[42] = 0;
+  return bytes;
 }
 
 class FixedPhotoPicker implements PhotoPicker {
@@ -626,39 +720,37 @@ Uint8List onePixelPngBytes() {
     0,
     1,
     8,
-    2,
+    6,
     0,
     0,
     0,
-    144,
-    119,
-    83,
-    222,
+    31,
+    21,
+    196,
+    137,
     0,
     0,
     0,
-    13,
+    11,
     73,
     68,
     65,
     84,
     120,
-    218,
+    156,
     99,
-    252,
-    207,
-    192,
-    80,
+    248,
     15,
+    4,
     0,
-    5,
-    131,
-    2,
-    127,
-    148,
-    173,
-    208,
-    95,
+    9,
+    251,
+    3,
+    253,
+    251,
+    94,
+    107,
+    43,
     0,
     0,
     0,

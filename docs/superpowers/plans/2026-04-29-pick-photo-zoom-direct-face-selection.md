@@ -1213,7 +1213,7 @@ git commit -m "feat: 확대 직접 얼굴 선택 구현"
 ## 최종 검증 기록
 
 - `cd apps/mobile && mise x flutter@3.22.1-stable -- dart format lib test`: 통과, 변경 없음.
-- `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`: 통과, 27 tests.
+- `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`: 통과, 29 tests.
 - `cd apps/backend && npm run prisma:generate`: 통과.
 - `cd apps/backend && npm test`: 통과, 9 tests.
 - `cd apps/backend && npm run test:e2e`: 통과, 15 tests.
