@@ -214,6 +214,14 @@ export class PhotosService {
       return [selectedFace];
     }
 
+    if (request.faceIds !== undefined && !Array.isArray(request.faceIds)) {
+      throw new BadRequestException({
+        message:
+          'faceIds must be an array when selectionMode is selected_faces.',
+        errorCategory: 'selection_invalid',
+      });
+    }
+
     const requestedFaceIds = Array.from(new Set(request.faceIds ?? []));
     if (requestedFaceIds.length === 0) {
       throw new BadRequestException({

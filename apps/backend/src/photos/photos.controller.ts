@@ -92,7 +92,8 @@ export class PhotosController {
 
   @Post('uploads/:uploadId/generations')
   @ApiOperation({
-    summary: 'Request ID-photo generation for one face or all faces',
+    summary:
+      'Request ID-photo generation for one face, selected faces, or all faces',
   })
   @ApiParam({
     name: 'uploadId',

@@ -166,6 +166,20 @@ describe('Photos workflow', () => {
     expect(response.body.errorCategory).toBe('selection_invalid');
   });
 
+  it('rejects selected-face generation when face ids are not an array', async () => {
+    const upload = await request(app.getHttpServer())
+      .post('/photos/uploads')
+      .attach('photo', Buffer.from('fake-image'), 'person.jpg')
+      .expect(201);
+
+    const response = await request(app.getHttpServer())
+      .post(`/photos/uploads/${upload.body.uploadId}/generations`)
+      .send({ selectionMode: 'selected_faces', faceIds: 123 })
+      .expect(400);
+
+    expect(response.body.errorCategory).toBe('selection_invalid');
+  });
+
   it('rejects selected-face generation when a face id does not belong to the upload', async () => {
     const upload = await request(app.getHttpServer())
       .post('/photos/uploads')
