@@ -65,11 +65,11 @@
 
 | Feature ID | Feature / behavior | Status | Progress | Requirements | Validation / tests | Blocker / next action |
 | --- | --- | --- | --- | --- | --- | --- |
-| F-001 | 얼굴 박스와 원본 사진 미리보기를 모바일 상태에 보관한다. | Not started | 0% | FR-002, FR-003, NFR-003 | `photo_flow_state_test.dart`, `photo_flow_api_test.dart` | 구현 시작 |
-| F-002 | 원본 사진 위 얼굴 박스를 직접 선택하고 선택 상태를 표시한다. | Not started | 0% | FR-005, FR-008, AC-004, AC-008, NFR-003, NFR-004 | `photo_flow_screen_test.dart`, 수동 화면 확인 | 구현 시작 |
-| F-003 | 확대, 이동, 맞춤, 원본 보기 버튼으로 작은 얼굴 선택을 지원한다. | Not started | 0% | NFR-003, NFR-007, NFR-008, 승인된 UX 설계 | `photo_flow_screen_test.dart`, 수동 확대 조작 확인 | 구현 시작 |
-| F-004 | 선택된 얼굴만 생성하도록 `selected_faces` API 계약을 추가한다. | Not started | 0% | FR-007, FR-008, AC-006, AC-008, NFR-004 | `photos.e2e-spec.ts`, `photo_flow_api_test.dart` | 구현 시작 |
-| F-005 | 얼굴 없음, 생성 실패, 선택 없음 상태를 모바일에서 명확히 보여준다. | Not started | 0% | FR-004, FR-009, FR-010, AC-003, AC-009, NFR-005 | `photo_flow_screen_test.dart` | 구현 시작 |
+| F-001 | 얼굴 박스와 원본 사진 미리보기를 모바일 상태에 보관한다. | Complete | 100% | FR-002, FR-003, NFR-003 | `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test` | 완료 |
+| F-002 | 원본 사진 위 얼굴 박스를 직접 선택하고 선택 상태를 표시한다. | Complete | 100% | FR-005, FR-008, AC-004, AC-008, NFR-003, NFR-004 | `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test` | 완료 |
+| F-003 | 확대, 이동, 맞춤, 원본 보기 버튼으로 작은 얼굴 선택을 지원한다. | Complete | 100% | NFR-003, NFR-007, NFR-008, 승인된 UX 설계 | `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test` | 완료 |
+| F-004 | 선택된 얼굴만 생성하도록 `selected_faces` API 계약을 추가한다. | Complete | 100% | FR-007, FR-008, AC-006, AC-008, NFR-004 | `cd apps/backend && npm run test:e2e`, `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test` | 완료 |
+| F-005 | 얼굴 없음, 생성 실패, 선택 없음 상태를 모바일에서 명확히 보여준다. | Complete | 100% | FR-004, FR-009, FR-010, AC-003, AC-009, NFR-005 | `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test` | 완료 |
 
 ## Task 1: 백엔드 `selected_faces` 계약 추가
 
@@ -1201,6 +1201,24 @@ git commit -m "feat: 확대 직접 얼굴 선택 구현"
 - 모바일 UI 변경은 `photo_flow` feature 폴더 안에 격리한다.
 - 백엔드 API 확장은 기존 `single_face`와 `all_faces`를 유지하므로 이전 클라이언트 요청은 계속 동작한다.
 - 문제가 생기면 `selected_faces` 전송을 모바일에서 단일 선택만 허용하는 방식으로 되돌릴 수 있지만, 그렇게 하면 승인된 임의 다중 선택 UX는 제한된다.
+
+## 구현 완료 기록
+
+- 2026-04-29에 Task 1부터 Task 4까지 subagent-driven 방식으로 구현했다.
+- 백엔드는 `selected_faces`와 `faceIds` 계약을 추가하고, non-array, empty, foreign face ID 요청을 `selection_invalid`로 거부한다.
+- 모바일은 `FaceBox`, 방어 복사되는 원본 미리보기 bytes, `FaceSelectionCanvas`, 확대/축소 controls, 직접 선택, 하단 선택 요약, no-selection guard, stale upload/generation guard를 포함한다.
+- 구현 리뷰에서 발견된 stale async completion, canvas decode race, zoom clamp, small-label clipping, 전체 Flutter 테스트 문구 불일치를 후속 커밋으로 보강했다.
+- `PRD.md`는 수정하지 않았다. 임의의 여러 얼굴 선택을 제품 요구사항으로 명시할지는 별도 PRD 개정 결정으로 남긴다.
+
+## 최종 검증 기록
+
+- `cd apps/mobile && mise x flutter@3.22.1-stable -- dart format lib test`: 통과, 변경 없음.
+- `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`: 통과, 27 tests.
+- `cd apps/backend && npm run prisma:generate`: 통과.
+- `cd apps/backend && npm test`: 통과, 9 tests.
+- `cd apps/backend && npm run test:e2e`: 통과, 15 tests.
+- `cd apps/backend && npm run build`: 통과.
+- `git diff --check`: 통과.
 
 ## Plan Review
 
