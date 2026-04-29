@@ -253,6 +253,65 @@ void main() {
     }
     expect(canvasScale(tester), closeTo(1, 0.001));
   });
+
+  testWidgets('clears stale canvas state when image bytes become invalid',
+      (tester) async {
+    var photoBytes = onePixelPngBytes();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 240,
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          photoBytes = invalidImageBytes();
+                        });
+                      },
+                      child: const Text('Use invalid image'),
+                    ),
+                    FaceSelectionCanvas(
+                      photoBytes: photoBytes,
+                      faces: const [
+                        DetectedFace(
+                          id: 'face-1',
+                          faceIndex: 0,
+                          box: FaceBox(
+                            left: 0.1,
+                            top: 0.1,
+                            width: 0.8,
+                            height: 0.8,
+                          ),
+                          confidence: 0.98,
+                        ),
+                      ],
+                      selectedFaceIds: const {},
+                      onFaceToggled: (_) {},
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await pumpDecodedCanvas(tester);
+
+    expect(find.text('얼굴 1 제외됨'), findsOneWidget);
+
+    await tester.tap(find.text('Use invalid image'));
+    await tester.pump();
+    await pumpDecodedCanvas(tester);
+
+    expect(find.text('사진 미리보기를 표시할 수 없습니다'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsNothing);
+  });
 }
 
 Future<void> pumpDecodedCanvas(WidgetTester tester) async {
@@ -266,6 +325,10 @@ Future<void> pumpDecodedCanvas(WidgetTester tester) async {
 double canvasScale(WidgetTester tester) {
   final transform = tester.widget<Transform>(find.byType(Transform).last);
   return transform.transform.getMaxScaleOnAxis();
+}
+
+Uint8List invalidImageBytes() {
+  return Uint8List.fromList([1, 2, 3]);
 }
 
 class FixedPhotoPicker implements PhotoPicker {

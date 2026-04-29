@@ -43,8 +43,10 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
   void didUpdateWidget(covariant FaceSelectionCanvas oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.photoBytes != widget.photoBytes) {
-      _decodeImage();
+      _imageSize = null;
+      _decodeError = null;
       _controller.value = Matrix4.identity();
+      _decodeImage();
     }
   }
 
