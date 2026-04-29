@@ -7,6 +7,6 @@ void main() {
     await tester.pumpWidget(const PickPhotoApp());
 
     expect(find.text('Pick Photo'), findsOneWidget);
-    expect(find.text('Upload photo'), findsOneWidget);
+    expect(find.text('사진 선택'), findsOneWidget);
   });
 }
