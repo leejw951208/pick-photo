@@ -38,11 +38,44 @@ void main() {
       sourcePhotoBytes: sourcePhotoBytes,
     );
 
-    expect(state.sourcePhotoBytes, sourcePhotoBytes);
+    expect(state.sourcePhotoBytes, [1, 2, 3]);
 
     final clearedState = state.copyWith(clearSourcePhotoBytes: true);
 
     expect(clearedState.sourcePhotoBytes, isNull);
+  });
+
+  test('source photo bytes are snapshotted from inputs', () {
+    final constructorBytes = Uint8List.fromList([1, 2, 3]);
+    final copyWithBytes = Uint8List.fromList([4, 5, 6]);
+
+    final constructedState = PhotoFlowState(
+      stage: PhotoFlowStage.reviewingFaces,
+      faces: const [],
+      selectedFaceIds: const {},
+      results: const [],
+      sourcePhotoBytes: constructorBytes,
+    );
+    final copiedState = const PhotoFlowState.initial().copyWith(
+      sourcePhotoBytes: copyWithBytes,
+    );
+
+    constructorBytes[0] = 9;
+    copyWithBytes[0] = 9;
+
+    expect(constructedState.sourcePhotoBytes, [1, 2, 3]);
+    expect(copiedState.sourcePhotoBytes, [4, 5, 6]);
+  });
+
+  test('source photo bytes getter returns a defensive copy', () {
+    final state = const PhotoFlowState.initial().copyWith(
+      sourcePhotoBytes: Uint8List.fromList([1, 2, 3]),
+    );
+
+    final returnedBytes = state.sourcePhotoBytes!;
+    returnedBytes[0] = 9;
+
+    expect(state.sourcePhotoBytes, [1, 2, 3]);
   });
 
   test('copyWith can clear a message', () {

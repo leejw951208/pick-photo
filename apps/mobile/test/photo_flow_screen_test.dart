@@ -168,12 +168,19 @@ class FailingUploadPhotoFlowApi implements PhotoFlowApi {
 }
 
 class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
+  static const _faceBox = FaceBox(left: 40, top: 30, width: 80, height: 96);
+
   @override
   Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
     return const FaceDetectionResult(
       uploadId: 'upload-1',
       faces: [
-        DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98),
+        DetectedFace(
+          id: 'face-1',
+          faceIndex: 0,
+          box: _faceBox,
+          confidence: 0.98,
+        ),
       ],
     );
   }
@@ -188,6 +195,9 @@ class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
 }
 
 class MultiFacePhotoFlowApi implements PhotoFlowApi {
+  static const _faceOneBox = FaceBox(left: 40, top: 30, width: 80, height: 96);
+  static const _faceTwoBox = FaceBox(left: 160, top: 30, width: 80, height: 96);
+
   Set<String> generatedFaceIds = const {};
 
   @override
@@ -195,8 +205,18 @@ class MultiFacePhotoFlowApi implements PhotoFlowApi {
     return const FaceDetectionResult(
       uploadId: 'upload-1',
       faces: [
-        DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98),
-        DetectedFace(id: 'face-2', faceIndex: 1, confidence: 0.94),
+        DetectedFace(
+          id: 'face-1',
+          faceIndex: 0,
+          box: _faceOneBox,
+          confidence: 0.98,
+        ),
+        DetectedFace(
+          id: 'face-2',
+          faceIndex: 1,
+          box: _faceTwoBox,
+          confidence: 0.94,
+        ),
       ],
     );
   }

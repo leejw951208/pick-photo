@@ -56,11 +56,14 @@ class PhotoFlowState {
     required Set<String> selectedFaceIds,
     required List<GeneratedPhoto> results,
     this.uploadId,
-    this.sourcePhotoBytes,
+    Uint8List? sourcePhotoBytes,
     this.message,
   })  : faces = List.unmodifiable(faces),
         selectedFaceIds = Set.unmodifiable(selectedFaceIds),
-        results = List.unmodifiable(results);
+        results = List.unmodifiable(results),
+        _sourcePhotoBytes = sourcePhotoBytes == null
+            ? null
+            : Uint8List.fromList(sourcePhotoBytes);
 
   const PhotoFlowState.initial()
       : stage = PhotoFlowStage.waitingForUpload,
@@ -68,16 +71,21 @@ class PhotoFlowState {
         selectedFaceIds = const {},
         results = const [],
         uploadId = null,
-        sourcePhotoBytes = null,
+        _sourcePhotoBytes = null,
         message = null;
 
   final PhotoFlowStage stage;
   final String? uploadId;
-  final Uint8List? sourcePhotoBytes;
+  final Uint8List? _sourcePhotoBytes;
   final List<DetectedFace> faces;
   final Set<String> selectedFaceIds;
   final List<GeneratedPhoto> results;
   final String? message;
+
+  Uint8List? get sourcePhotoBytes {
+    final bytes = _sourcePhotoBytes;
+    return bytes == null ? null : Uint8List.fromList(bytes);
+  }
 
   PhotoFlowState copyWith({
     PhotoFlowStage? stage,
