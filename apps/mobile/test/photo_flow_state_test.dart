@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pick_photo/features/photo_flow/photo_flow_state.dart';
 
@@ -14,7 +16,13 @@ void main() {
   });
 
   test('selected face state tracks one face', () {
-    const face = DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98);
+    const testBox = FaceBox(left: 80, top: 60, width: 240, height: 280);
+    const face = DetectedFace(
+      id: 'face-1',
+      faceIndex: 0,
+      box: testBox,
+      confidence: 0.98,
+    );
     final state = const PhotoFlowState.initial().copyWith(
       stage: PhotoFlowStage.reviewingFaces,
       faces: [face],
@@ -22,6 +30,19 @@ void main() {
     );
 
     expect(state.selectedFaceIds, {'face-1'});
+  });
+
+  test('state can keep source photo bytes for face review', () {
+    final sourcePhotoBytes = Uint8List.fromList([1, 2, 3]);
+    final state = const PhotoFlowState.initial().copyWith(
+      sourcePhotoBytes: sourcePhotoBytes,
+    );
+
+    expect(state.sourcePhotoBytes, sourcePhotoBytes);
+
+    final clearedState = state.copyWith(clearSourcePhotoBytes: true);
+
+    expect(clearedState.sourcePhotoBytes, isNull);
   });
 
   test('copyWith can clear a message', () {
@@ -45,9 +66,19 @@ void main() {
   });
 
   test('state collections cannot be mutated from outside', () {
-    const face = DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98);
-    const otherFace =
-        DetectedFace(id: 'face-2', faceIndex: 1, confidence: 0.94);
+    const testBox = FaceBox(left: 80, top: 60, width: 240, height: 280);
+    const face = DetectedFace(
+      id: 'face-1',
+      faceIndex: 0,
+      box: testBox,
+      confidence: 0.98,
+    );
+    const otherFace = DetectedFace(
+      id: 'face-2',
+      faceIndex: 1,
+      box: testBox,
+      confidence: 0.94,
+    );
     const result = GeneratedPhoto(
       id: 'result-1',
       faceId: 'face-1',

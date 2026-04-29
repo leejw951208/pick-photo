@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 enum PhotoFlowStage {
   waitingForUpload,
   uploading,
@@ -7,15 +9,31 @@ enum PhotoFlowStage {
   failed,
 }
 
+class FaceBox {
+  const FaceBox({
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+}
+
 class DetectedFace {
   const DetectedFace({
     required this.id,
     required this.faceIndex,
+    required this.box,
     required this.confidence,
   });
 
   final String id;
   final int faceIndex;
+  final FaceBox box;
   final double confidence;
 }
 
@@ -38,6 +56,7 @@ class PhotoFlowState {
     required Set<String> selectedFaceIds,
     required List<GeneratedPhoto> results,
     this.uploadId,
+    this.sourcePhotoBytes,
     this.message,
   })  : faces = List.unmodifiable(faces),
         selectedFaceIds = Set.unmodifiable(selectedFaceIds),
@@ -49,10 +68,12 @@ class PhotoFlowState {
         selectedFaceIds = const {},
         results = const [],
         uploadId = null,
+        sourcePhotoBytes = null,
         message = null;
 
   final PhotoFlowStage stage;
   final String? uploadId;
+  final Uint8List? sourcePhotoBytes;
   final List<DetectedFace> faces;
   final Set<String> selectedFaceIds;
   final List<GeneratedPhoto> results;
@@ -64,8 +85,10 @@ class PhotoFlowState {
     Set<String>? selectedFaceIds,
     List<GeneratedPhoto>? results,
     String? uploadId,
+    Uint8List? sourcePhotoBytes,
     String? message,
     bool clearUploadId = false,
+    bool clearSourcePhotoBytes = false,
     bool clearMessage = false,
   }) {
     return PhotoFlowState(
@@ -74,6 +97,9 @@ class PhotoFlowState {
       selectedFaceIds: selectedFaceIds ?? this.selectedFaceIds,
       results: results ?? this.results,
       uploadId: clearUploadId ? null : uploadId ?? this.uploadId,
+      sourcePhotoBytes: clearSourcePhotoBytes
+          ? null
+          : sourcePhotoBytes ?? this.sourcePhotoBytes,
       message: clearMessage ? null : message ?? this.message,
     );
   }

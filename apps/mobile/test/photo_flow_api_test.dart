@@ -92,6 +92,10 @@ void main() {
 
     expect(detection.uploadId, 'upload-1');
     expect(detection.faces.single.id, 'upload-1-face-0');
+    expect(detection.faces.single.box.left, 80);
+    expect(detection.faces.single.box.top, 60);
+    expect(detection.faces.single.box.width, 240);
+    expect(detection.faces.single.box.height, 280);
     expect(results.single.url,
         'http://server.test/results/generated/upload-1/upload-1-face-0.jpg');
     expect(requests, [
@@ -100,5 +104,36 @@ void main() {
       'POST /photos/uploads/upload-1/generations',
       'GET /photos/generations/generation-1',
     ]);
+  });
+
+  test('NestPhotoFlowApi sends selected_faces for multiple selected ids',
+      () async {
+    final api = NestPhotoFlowApi(
+      baseUrl: 'http://server.test',
+      client: MockClient((request) async {
+        if (request.url.path == '/photos/uploads/upload-1/generations') {
+          expect(request, isA<http.Request>());
+          expect(
+            (request as http.Request).body,
+            '{"selectionMode":"selected_faces","faceIds":["face-1","face-2"]}',
+          );
+          return http.Response(
+            '{"generationId":"generation-1","status":"succeeded"}',
+            201,
+          );
+        }
+
+        if (request.url.path == '/photos/generations/generation-1') {
+          return http.Response(
+            '{"generationId":"generation-1","status":"succeeded","results":[]}',
+            200,
+          );
+        }
+
+        return http.Response('not found', 404);
+      }),
+    );
+
+    await api.generateForFaces('upload-1', {'face-1', 'face-2'});
   });
 }

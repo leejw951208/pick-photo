@@ -110,11 +110,7 @@ class NestPhotoFlowApi implements PhotoFlowApi {
     final createResponse = await _client.post(
       _uri('/photos/uploads/$uploadId/generations'),
       headers: const {'Content-Type': 'application/json'},
-      body: jsonEncode(
-        faceIds.length == 1
-            ? {'selectionMode': 'single_face', 'faceId': faceIds.single}
-            : {'selectionMode': 'all_faces'},
-      ),
+      body: jsonEncode(_generationRequestBody(faceIds)),
     );
     final createBody = _decodeObject(createResponse);
     final generationId = createBody['generationId'] as String?;
@@ -138,6 +134,21 @@ class NestPhotoFlowApi implements PhotoFlowApi {
 
   Uri _uri(String path) => Uri.parse('$_baseUrl$path');
 
+  Map<String, Object> _generationRequestBody(Set<String> faceIds) {
+    final sortedFaceIds = faceIds.toList()..sort();
+    if (sortedFaceIds.length == 1) {
+      return {
+        'selectionMode': 'single_face',
+        'faceId': sortedFaceIds.single,
+      };
+    }
+
+    return {
+      'selectionMode': 'selected_faces',
+      'faceIds': sortedFaceIds,
+    };
+  }
+
   Map<String, dynamic> _decodeObject(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw PhotoFlowApiException(
@@ -154,9 +165,17 @@ class NestPhotoFlowApi implements PhotoFlowApi {
   }
 
   DetectedFace _detectedFaceFromJson(Map<String, dynamic> json) {
+    final box = json['box'] as Map<String, dynamic>;
+
     return DetectedFace(
       id: json['id'] as String,
       faceIndex: json['faceIndex'] as int,
+      box: FaceBox(
+        left: (box['left'] as num).toDouble(),
+        top: (box['top'] as num).toDouble(),
+        width: (box['width'] as num).toDouble(),
+        height: (box['height'] as num).toDouble(),
+      ),
       confidence: (json['confidence'] as num).toDouble(),
     );
   }
@@ -180,7 +199,12 @@ class FakePhotoFlowApi implements PhotoFlowApi {
     return const FaceDetectionResult(
       uploadId: 'upload-1',
       faces: [
-        DetectedFace(id: 'face-1', faceIndex: 0, confidence: 0.98),
+        DetectedFace(
+          id: 'face-1',
+          faceIndex: 0,
+          box: FaceBox(left: 40, top: 30, width: 80, height: 96),
+          confidence: 0.98,
+        ),
       ],
     );
   }
