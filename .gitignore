@@ -1,4 +1,10 @@
 .worktrees/
+.superpowers/
+
+# Environment/secrets
+.env
+.env.*
+!.env.example
 
 # Python
 .venv/
@@ -10,6 +16,7 @@ __pycache__/
 # Node/NestJS
 node_modules/
 dist/
+apps/backend/src/generated/
 apps/backend/storage/
 
 # Flutter/Dart

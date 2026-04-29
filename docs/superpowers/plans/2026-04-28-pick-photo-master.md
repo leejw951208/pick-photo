@@ -5,7 +5,7 @@
 ## 진행 현황 (2026-04-28)
 
 - 완료: 계약 문서, PostgreSQL 초기 스키마, Python AI fake 서버, NestJS API/Swagger/fake 워크플로, Flutter 업로드/얼굴 선택/생성 요청 흐름, `apps/mobile`, `apps/backend`, `apps/ai` 폴더 구조 정리.
-- 완료: NestJS 백엔드 업로드 로컬 저장, `DATABASE_URL` 기반 PostgreSQL 저장소 어댑터, `AI_SERVICE_BASE_URL` 기반 Python AI 서버 HTTP 어댑터 연결.
+- 완료: NestJS 백엔드 업로드 로컬 저장, `DATABASE_URL` 기반 Prisma 7 PostgreSQL 저장소 어댑터, `AI_SERVICE_BASE_URL` 기반 Python AI 서버 HTTP 어댑터 연결.
 - 완료: Python AI 서버 기본 동작을 OpenCV/Pillow 로컬 이미지 처리로 전환하고, fake 모드는 `PICK_PHOTO_AI_MODE=fake`로 유지.
 - 완료: Docker Compose로 PostgreSQL, Python AI 서버, NestJS 백엔드를 함께 실행하는 로컬 통합 환경 구성.
 - 다음 예정: 생성 결과 이미지 제공/다운로드, 모바일 결과 이미지 미리보기와 저장 UX, 개인정보 동의/보관/삭제 실행, 운영 문서와 반복 가능한 migration runner.
@@ -15,7 +15,7 @@
 
 **Architecture:** Keep the Flutter app, NestJS server, Python AI server, and PostgreSQL assets in independent folders. Cross-project behavior is coordinated through documented contracts in `docs/contracts` rather than shared code.
 
-**Tech Stack:** Flutter 3.22.1 / Dart 3.4.1, NestJS 11 with npm, Python 3.12 / FastAPI, and PostgreSQL SQL migrations. Verified versions and validation commands are recorded in `AGENTS.md`.
+**Tech Stack:** Flutter 3.22.1 / Dart 3.4.1, NestJS 11 with npm, Prisma 7 PostgreSQL driver adapter, Python 3.12 / FastAPI, and PostgreSQL SQL migrations. Verified versions and validation commands are recorded in `AGENTS.md`.
 
 ---
 
@@ -38,7 +38,7 @@
 | F-001 | 계약 문서와 프로젝트 구조 기반 | Complete | 100% | PRD 전체 첫 구현 범위 | `find docs/contracts -maxdepth 1 -type f \| sort` | none |
 | F-002 | PostgreSQL 초기 데이터 모델과 SQL migration | Complete | 100% | NFR-006, workflow status requirements | `database/migrations/001_initial_schema.sql` 검토 | none |
 | F-003 | Python AI HTTP 계약과 fake fallback | Complete | 100% | FR-002, FR-007 | `cd apps/ai && .venv/bin/python -m pytest -q` | none |
-| F-004 | NestJS public API, upload storage, AI/DB adapters | Complete | 100% | FR-001, FR-002, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010 | `cd apps/backend && npm test`; `cd apps/backend && npm run test:e2e`; `cd apps/backend && npm run build` | none |
+| F-004 | NestJS public API, upload storage, AI/Prisma DB adapters | Complete | 100% | FR-001, FR-002, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010 | `cd apps/backend && npm run prisma:generate`; `cd apps/backend && npm test`; `cd apps/backend && npm run test:e2e`; `cd apps/backend && npm run build` | none |
 | F-005 | Flutter upload, face review, single/all generation request, result URL list | Complete | 100% | FR-001, FR-003, FR-004, FR-005, FR-006, FR-009, FR-010, FR-012, NFR-007 | `cd apps/mobile && mise x flutter@3.22.1-stable -- flutter test`; `cd apps/mobile && mise x flutter@3.22.1-stable -- dart format lib test` | none |
 | F-006 | OpenCV/Pillow 기반 로컬 얼굴 감지와 413x531 JPEG 생성 | Complete | 100% | FR-002, FR-003, FR-004, FR-007, FR-008, NFR-001, NFR-002, NFR-006 | `cd apps/ai && .venv/bin/python -m pytest -q` | none |
 | F-007 | 생성 결과 이미지 제공/다운로드 API | Not started | 0% | FR-011, AC-007 | No verified test command yet | 다음 구현 대상 |

@@ -16,7 +16,15 @@ npm run start:dev
 - `PORT`: 서버 포트. 기본값은 `3000`.
 - `PHOTO_STORAGE_DIR`: 업로드 파일을 저장할 로컬 디렉터리. 기본값은 `apps/backend/storage`.
 - `AI_SERVICE_BASE_URL`: 설정하면 Python AI 서버의 HTTP API를 호출한다. 없으면 deterministic fake AI 클라이언트를 사용한다.
-- `DATABASE_URL`: 설정하면 PostgreSQL 저장소 어댑터를 사용한다. 없으면 로컬 테스트용 in-memory 저장소를 사용한다.
+- `DATABASE_URL`: 설정하면 Prisma 7 PostgreSQL driver adapter 기반 저장소를 사용한다. 없으면 로컬 테스트용 in-memory 저장소를 사용한다.
+
+## Prisma
+
+- Prisma 설정 파일은 `prisma.config.ts`다.
+- Prisma schema는 `prisma/schema.prisma`다.
+- Prisma Client는 `npm run prisma:generate`로 `src/generated/prisma/`에 생성되며 git에는 포함하지 않는다.
+- `npm test`, `npm run test:e2e`, `npm run build`, `npm run start:dev`는 실행 전에 Prisma Client를 자동 생성한다.
+- 현재 데이터베이스 초기화는 기존 `database/migrations/001_initial_schema.sql`을 기준으로 하며, Prisma Migrate는 아직 도입하지 않았다.
 
 ## 현재 저장 동작
 

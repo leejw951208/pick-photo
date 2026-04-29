@@ -102,7 +102,7 @@ npm ci
 PHOTO_STORAGE_DIR=/tmp/pick-photo-storage AI_SERVICE_BASE_URL=http://localhost:8000 npm run start:dev
 ```
 
-`AI_SERVICE_BASE_URL`을 생략하면 백엔드는 TypeScript 가짜 AI 클라이언트를 사용합니다. `DATABASE_URL`을 생략하면 메모리 기반 처리 흐름 저장소를 사용합니다.
+`AI_SERVICE_BASE_URL`을 생략하면 백엔드는 TypeScript 가짜 AI 클라이언트를 사용합니다. `DATABASE_URL`을 생략하면 메모리 기반 처리 흐름 저장소를 사용합니다. `DATABASE_URL`을 설정하면 백엔드는 Prisma 7의 PostgreSQL driver adapter를 통해 처리 흐름 메타데이터를 저장합니다.
 
 ## 검증
 
@@ -127,6 +127,7 @@ cd apps/ai
 
 ```bash
 cd apps/backend
+npm run prisma:generate
 npm test
 npm run test:e2e
 npm run build

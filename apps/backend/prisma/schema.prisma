@@ -1,0 +1,96 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum workflow_status {
+  pending
+  processing
+  succeeded
+  failed
+  deleted
+}
+
+model PhotoUpload {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  originalFilename String          @map("original_filename")
+  contentType      String          @map("content_type")
+  byteSize         BigInt          @map("byte_size")
+  storageKey       String          @map("storage_key")
+  status           workflow_status @default(pending)
+  errorCategory    String?         @map("error_category")
+  errorMessage     String?         @map("error_message")
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime?       @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("photo_uploads")
+}
+
+model DetectedFace {
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  photoUploadId     String          @map("photo_upload_id") @db.Uuid
+  faceIndex         Int             @map("face_index")
+  boundingBoxLeft   Int             @map("bounding_box_left")
+  boundingBoxTop    Int             @map("bounding_box_top")
+  boundingBoxWidth  Int             @map("bounding_box_width")
+  boundingBoxHeight Int             @map("bounding_box_height")
+  confidence        Decimal         @db.Decimal(5, 4)
+  previewStorageKey String?         @map("preview_storage_key")
+  status            workflow_status @default(succeeded)
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([id, photoUploadId])
+  @@unique([photoUploadId, faceIndex])
+  @@index([photoUploadId], map: "idx_detected_faces_upload_id")
+  @@map("detected_faces")
+}
+
+model GenerationJob {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  photoUploadId String          @map("photo_upload_id") @db.Uuid
+  selectionMode String          @map("selection_mode")
+  status        workflow_status @default(pending)
+  errorCategory String?         @map("error_category")
+  errorMessage  String?         @map("error_message")
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  completedAt   DateTime?       @map("completed_at") @db.Timestamptz(6)
+
+  @@unique([id, photoUploadId])
+  @@index([photoUploadId], map: "idx_generation_jobs_upload_id")
+  @@map("generation_jobs")
+}
+
+model GenerationJobFace {
+  generationJobId String @map("generation_job_id") @db.Uuid
+  detectedFaceId  String @map("detected_face_id") @db.Uuid
+  photoUploadId   String @map("photo_upload_id") @db.Uuid
+
+  @@id([generationJobId, detectedFaceId])
+  @@map("generation_job_faces")
+}
+
+model GeneratedPhoto {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  generationJobId String          @map("generation_job_id") @db.Uuid
+  detectedFaceId  String          @map("detected_face_id") @db.Uuid
+  storageKey      String          @map("storage_key")
+  width           Int
+  height          Int
+  contentType     String          @map("content_type")
+  byteSize        BigInt          @map("byte_size")
+  status          workflow_status @default(succeeded)
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt       DateTime?       @map("deleted_at") @db.Timestamptz(6)
+
+  @@index([generationJobId], map: "idx_generated_photos_job_id")
+  @@index([detectedFaceId], map: "idx_generated_photos_face_id")
+  @@map("generated_photos")
+}

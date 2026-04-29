@@ -5,7 +5,7 @@
 ## 진행 현황 (2026-04-28)
 
 - 완료: NestJS 프로젝트 생성, 사진 업로드 API, 얼굴 목록 API, 생성 요청 API, 생성 결과 API, Swagger 문서, fake AI 기반 in-memory 워크플로.
-- 완료: 업로드 파일 로컬 저장소, PostgreSQL 저장소 어댑터, Python AI 서버 HTTP 어댑터.
+- 완료: 업로드 파일 로컬 저장소, Prisma 7 PostgreSQL 저장소 어댑터, Python AI 서버 HTTP 어댑터.
 - 현재 연결 상태: `AI_SERVICE_BASE_URL` 설정 시 Python AI 서버의 로컬 OpenCV/Pillow 결과 metadata를 받아 generation record에 저장한다.
 - 남은 작업: `/results/...` result URL이 실제 파일 byte를 제공하도록 image serving/download 구현, backend storage root와 AI storage root 운영 설정 정리, 보관/삭제 정책 실행, 로컬 PostgreSQL 검증 명령 확정.
 
@@ -13,7 +13,7 @@
 
 **Architecture:** Keep the NestJS server in `apps/backend/`. The server exposes public API endpoints to the Flutter app and calls the Python AI server through a narrow adapter.
 
-**Tech Stack:** NestJS with TypeScript. Exact package manager and generated project metadata must be confirmed during scaffolding.
+**Tech Stack:** NestJS with TypeScript, npm, Prisma 7 PostgreSQL driver adapter, and Jest. Verified package metadata is in `apps/backend/package.json`.
 
 ---
 
