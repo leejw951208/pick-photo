@@ -19,10 +19,12 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Face 1'), findsOneWidget);
+    expect(find.text('사진에서 얼굴을 선택해 주세요'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsOneWidget);
+    expect(find.text('선택한 얼굴 0명 / 전체 1명'), findsOneWidget);
   });
 
   testWidgets('shows failure message when upload has no faces', (tester) async {
@@ -35,12 +37,12 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
 
-    expect(find.text('No face found'), findsOneWidget);
-    expect(find.text('Face 1'), findsNothing);
-    expect(find.text('Generate all faces'), findsNothing);
+    expect(find.text('얼굴을 찾지 못했습니다'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsNothing);
+    expect(find.text('선택한 얼굴 생성'), findsNothing);
   });
 
   testWidgets('shows retryable failure message when upload throws',
@@ -54,32 +56,37 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Upload failed. Try again'), findsOneWidget);
-    expect(find.text('Face 1'), findsNothing);
-    expect(find.text('Generate all faces'), findsNothing);
+    expect(find.text('업로드에 실패했습니다. 다시 시도해 주세요'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsNothing);
+    expect(find.text('선택한 얼굴 생성'), findsNothing);
     expect(find.textContaining('Generated result'), findsNothing);
   });
 
   testWidgets('shows generated result after selecting a face', (tester) async {
+    final api = MultiFacePhotoFlowApi();
     await tester.pumpWidget(
       MaterialApp(
         home: PhotoFlowScreen(
-          api: FakePhotoFlowApi(),
+          api: api,
           photoPicker: FixedPhotoPicker('person.jpg'),
         ),
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Face 1'));
+    await tester.tap(find.text('얼굴 1 제외됨'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Generation complete'), findsOneWidget);
+    expect(api.generatedFaceIds, {'face-1'});
+    expect(find.text('생성이 완료되었습니다'), findsOneWidget);
     expect(find.text('Generated result for face-1'), findsOneWidget);
+    expect(find.text('Generated result for face-2'), findsNothing);
     expect(
       find.text('https://example.invalid/results/face-1.jpg'),
       findsOneWidget,
@@ -97,14 +104,63 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Face 1'));
+    await tester.tap(find.text('얼굴 1 제외됨'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Generation failed. Try again'), findsOneWidget);
-    expect(find.text('Face 1'), findsOneWidget);
+    expect(find.text('생성에 실패했습니다. 다시 시도해 주세요'), findsOneWidget);
+    expect(find.text('선택한 얼굴 1명 / 전체 1명'), findsOneWidget);
     expect(find.textContaining('Generated result'), findsNothing);
+  });
+
+  testWidgets('generates only directly selected faces', (tester) async {
+    final api = MultiFacePhotoFlowApi();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: FixedPhotoPicker('person.jpg'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('얼굴 1 제외됨'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
+    await tester.pumpAndSettle();
+
+    expect(api.generatedFaceIds, {'face-1'});
+    expect(find.text('생성이 완료되었습니다'), findsOneWidget);
+    expect(find.text('Generated result for face-1'), findsOneWidget);
+    expect(find.text('Generated result for face-2'), findsNothing);
+  });
+
+  testWidgets(
+      'shows selection message before generating without selected faces',
+      (tester) async {
+    final api = MultiFacePhotoFlowApi();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: FixedPhotoPicker('person.jpg'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
+    await tester.pumpAndSettle();
+
+    expect(api.generatedFaceIds, isEmpty);
+    expect(find.text('생성할 얼굴을 먼저 선택해 주세요'), findsOneWidget);
   });
 
   testWidgets('generates results for all detected faces', (tester) async {
@@ -118,17 +174,19 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Upload photo'));
+    await tester.tap(find.text('사진 선택'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Face 1'), findsOneWidget);
-    expect(find.text('Face 2'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsOneWidget);
+    expect(find.text('얼굴 2 제외됨'), findsOneWidget);
 
-    await tester.tap(find.text('Generate all faces'));
+    await tester.tap(find.text('전체 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
     await tester.pumpAndSettle();
 
     expect(api.generatedFaceIds, unorderedEquals(['face-1', 'face-2']));
-    expect(find.text('Generation complete'), findsOneWidget);
+    expect(find.text('생성이 완료되었습니다'), findsOneWidget);
     expect(find.text('Generated result for face-1'), findsOneWidget);
     expect(find.text('Generated result for face-2'), findsOneWidget);
     expect(find.text('https://example.invalid/results/face-1.jpg'),
@@ -437,7 +495,7 @@ class FailingUploadPhotoFlowApi implements PhotoFlowApi {
 }
 
 class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
-  static const _faceBox = FaceBox(left: 40, top: 30, width: 80, height: 96);
+  static const _faceBox = FaceBox(left: 0.1, top: 0.1, width: 0.8, height: 0.8);
 
   @override
   Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
@@ -464,8 +522,10 @@ class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
 }
 
 class MultiFacePhotoFlowApi implements PhotoFlowApi {
-  static const _faceOneBox = FaceBox(left: 40, top: 30, width: 80, height: 96);
-  static const _faceTwoBox = FaceBox(left: 160, top: 30, width: 80, height: 96);
+  static const _faceOneBox =
+      FaceBox(left: 0.05, top: 0.1, width: 0.25, height: 0.35);
+  static const _faceTwoBox =
+      FaceBox(left: 0.65, top: 0.1, width: 0.25, height: 0.35);
 
   Set<String> generatedFaceIds = const {};
 
