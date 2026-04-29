@@ -8,21 +8,25 @@
 - Product reference: `pick-photo/PRD.md` is the Korean product requirements baseline. It describes what the service is, who it serves, product requirements, acceptance criteria, assumptions, and open product questions. Do not add technical implementation details to `pick-photo/PRD.md`.
 - Canonical local harness path: `pick-photo/.agents/skills/project-harness/SKILL.md`.
 - System design document: `pick-photo/docs/superpowers/specs/2026-04-28-pick-photo-system-design.md`.
+- Face selection UX design document: `pick-photo/docs/superpowers/specs/2026-04-29-pick-photo-zoom-direct-face-selection-design.md`. It fixes the face review UX direction as original-photo direct face selection plus zoom/pan-assisted selection mode plus a bottom selection summary; lower face lists are not the primary selection control for this UX.
 - Implementation plan documents: `pick-photo/docs/superpowers/plans/2026-04-28-pick-photo-master.md`, `pick-photo/docs/superpowers/plans/2026-04-28-pick-photo-flutter-app.md`, `pick-photo/docs/superpowers/plans/2026-04-28-pick-photo-nestjs-server.md`, `pick-photo/docs/superpowers/plans/2026-04-28-pick-photo-python-ai-server.md`, and `pick-photo/docs/superpowers/plans/2026-04-28-pick-photo-database.md`.
 - Contract documents: `pick-photo/docs/contracts/api.md`, `pick-photo/docs/contracts/ai-service.md`, `pick-photo/docs/contracts/data-model.md`, and `pick-photo/docs/contracts/privacy.md`.
 - App shape: independent project folders are `pick-photo/apps/mobile/`, `pick-photo/apps/backend/`, `pick-photo/apps/ai/`, and `pick-photo/database/`; cross-project behavior is coordinated through `pick-photo/docs/contracts/` rather than shared application code.
 - Flutter app: `pick-photo/apps/mobile/` is a Flutter app named `pick_photo`; source entrypoint is `pick-photo/apps/mobile/lib/main.dart`; photo-flow feature files live in `pick-photo/apps/mobile/lib/features/photo_flow/`; the app uses a file picker and `NestPhotoFlowApi` to upload selected photos to `http://localhost:3000` by default, configurable with `PICK_PHOTO_API_BASE_URL`.
+- Current Flutter face state keeps detected face `id`, `faceIndex`, and `confidence`; `pick-photo/apps/mobile/lib/features/photo_flow/photo_flow_api.dart` currently drops the backend `box` field when parsing detected faces. The backend DTO and `docs/contracts/api.md` already define detected face `box` coordinates.
 - NestJS server: `pick-photo/apps/backend/` is a private npm project using NestJS; source entrypoint is `pick-photo/apps/backend/src/main.ts`; photo API files live in `pick-photo/apps/backend/src/photos/`; AI adapter lives in `pick-photo/apps/backend/src/ai/`; local CORS is enabled; Swagger UI is served at `/docs` and OpenAPI JSON at `/docs-json`.
-- Backend storage and adapter behavior: uploaded files are stored through `LocalPhotoStorage`, defaulting to `pick-photo/apps/backend/storage/` when run from `pick-photo/apps/backend`; `PHOTO_STORAGE_DIR` overrides that path; `AI_SERVICE_BASE_URL` enables the Python AI HTTP adapter and absence of that env var falls back to deterministic fake AI; `DATABASE_URL` enables the PostgreSQL repository using `pg` and absence of that env var falls back to the in-memory repository.
+- Backend storage and adapter behavior: uploaded files are stored through `LocalPhotoStorage`, defaulting to `pick-photo/apps/backend/storage/` when run from `pick-photo/apps/backend`; `PHOTO_STORAGE_DIR` overrides that path; `AI_SERVICE_BASE_URL` enables the Python AI HTTP adapter and absence of that env var falls back to deterministic fake AI; `DATABASE_URL` enables the Prisma 7 PostgreSQL repository using `@prisma/adapter-pg` and absence of that env var falls back to the in-memory repository.
+- Backend Prisma configuration: Prisma config lives at `pick-photo/apps/backend/prisma.config.ts`; Prisma schema lives at `pick-photo/apps/backend/prisma/schema.prisma`; `npm run prisma:generate` generates the untracked client into `pick-photo/apps/backend/src/generated/prisma/`; backend test, build, and start scripts run generation through npm pre-scripts.
 - Python AI server: `pick-photo/apps/ai/` is a Python package named `pick-photo-ai-server`; FastAPI entrypoint is `pick-photo/apps/ai/app/main.py`; deterministic fake AI behavior lives in `pick-photo/apps/ai/app/fake_ai.py`.
 - Database assets: `pick-photo/database/migrations/001_initial_schema.sql` defines the initial PostgreSQL schema; `pick-photo/database/seeds/README.md` reserves the seed workflow. Backend repository code can write workflow metadata to PostgreSQL when `DATABASE_URL` is configured. Docker Compose verifies local PostgreSQL startup with the initial schema, but no repeatable migration runner for non-empty databases is selected yet.
 - Docker local runtime: `pick-photo/docker-compose.yml` runs PostgreSQL, the Python AI server, and the NestJS backend together. The Compose stack mounts `pick-photo/database/migrations/001_initial_schema.sql` into PostgreSQL init, shares a named storage volume between backend and AI at `/data/storage`, exposes backend `3000`, AI `8000`, and PostgreSQL `5432`, and leaves Flutter to run locally against `http://localhost:3000`.
 - Languages and runtimes:
   - Flutter 3.22.1 stable and Dart 3.4.1 are verified through `mise x flutter@3.22.1-stable -- flutter --version`; `apps/mobile/pubspec.yaml` requires Dart SDK `>=3.4.1 <4.0.0`.
-  - Node.js v22.20.0 and npm 10.9.3 are verified locally; `apps/backend/package.json` uses NestJS `^11.0.1`, Jest, TypeScript, and npm scripts.
+  - Node.js v22.20.0 and npm 10.9.3 are verified locally; `apps/backend/package.json` uses NestJS `^11.0.1`, Prisma `^7.8.0`, Jest, TypeScript, and npm scripts.
   - Python 3.12.12 is verified at `/opt/homebrew/bin/python3.12`; `apps/ai/pyproject.toml` requires Python `>=3.11`.
 - Verified validation commands:
   - `cd apps/ai && .venv/bin/python -m pytest -q`
+  - `cd apps/backend && npm run prisma:generate`
   - `cd apps/backend && npm test`
   - `cd apps/backend && npm run test:e2e`
   - `cd apps/backend && npm run build`
@@ -52,6 +56,7 @@
 - Decision needed: PostgreSQL migration runner for non-empty databases, production transaction policy, and seed/fixture workflow.
 - Decision needed: local development commands beyond the verified validation commands, lint coverage policy, deployment, observability, and operations commands.
 - Decision needed: privacy, consent, personal data handling, image retention, deletion, logging redaction, and compliance requirements for uploaded photos and generated ID photos.
+- Decision needed: source photo preview serving for Flutter face selection, face crop thumbnail source, confidence threshold for `확인 필요`, and retention or expiration behavior for source previews and face previews.
 
 ## Always-On Rules
 
@@ -78,7 +83,8 @@
 - Use only verified repository commands for testing or validation. If a relevant project lacks a verified command, report that gap explicitly.
 - Do not treat commands listed in `Project decisions to define` as verified while they are unresolved, stale, conflicting, missing, `Decision needed`, or `To be defined`.
 - When changing product behavior, user-facing behavior, requirements, or scope, check whether `PRD.md` needs a product-only update. Keep technical updates out of `PRD.md`.
-- Generated/cache artifacts such as Python virtualenvs, `__pycache__`, Node `node_modules`, NestJS `dist`, Flutter `.dart_tool`, Flutter `build`, and local platform files under `pick-photo/` must remain untracked.
+- When changing the face review UX, align with `docs/superpowers/specs/2026-04-29-pick-photo-zoom-direct-face-selection-design.md`: use original-photo direct selection as the primary interaction, support zoom/pan-assisted selection for dense or small faces, preserve clear selected/excluded/needs-review states, and keep the bottom area as a selection summary rather than the primary face list.
+- Generated/cache artifacts such as Python virtualenvs, `__pycache__`, Node `node_modules`, NestJS `dist`, Prisma generated client files under `pick-photo/apps/backend/src/generated/`, Flutter `.dart_tool`, Flutter `build`, and local platform files under `pick-photo/` must remain untracked.
 - Flutter Android build is not yet verified. Flutter scaffold generation emitted a Java 21 / Gradle 7.6.3 compatibility warning; treat Android build compatibility as a later task.
 
 ## Skill Entrypoint
