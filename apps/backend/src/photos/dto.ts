@@ -37,9 +37,15 @@ export interface DetectedFacesResponseDto {
   faces: DetectedFaceDto[];
 }
 
+export type GenerationSelectionMode =
+  | 'single_face'
+  | 'selected_faces'
+  | 'all_faces';
+
 export interface CreateGenerationRequestDto {
-  selectionMode: 'single_face' | 'all_faces';
+  selectionMode: GenerationSelectionMode;
   faceId?: string;
+  faceIds?: string[];
 }
 
 export interface CreateGenerationResponseDto {

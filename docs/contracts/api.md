@@ -65,7 +65,7 @@ Each `box`:
 
 ### `POST /photos/uploads/:uploadId/generations`
 
-Requests ID-photo generation for one face or all faces.
+Requests ID-photo generation for one face, selected faces, or all faces.
 
 Path fields:
 
@@ -73,8 +73,9 @@ Path fields:
 
 Request fields:
 
-- `selectionMode`: one of `single_face` or `all_faces`.
+- `selectionMode`: one of `single_face`, `selected_faces`, or `all_faces`.
 - `faceId`: optional string identifier for the selected face; required when `selectionMode` is `single_face`.
+- `faceIds`: optional array of selected face identifiers; required and non-empty when `selectionMode` is `selected_faces`.
 
 Response fields:
 

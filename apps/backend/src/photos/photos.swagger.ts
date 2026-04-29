@@ -104,13 +104,22 @@ export const createGenerationBodySchema: SchemaObject = {
   properties: {
     selectionMode: {
       type: 'string',
-      enum: ['single_face', 'all_faces'] as string[],
-      example: 'all_faces',
+      enum: ['single_face', 'selected_faces', 'all_faces'] as string[],
+      example: 'selected_faces',
     },
     faceId: {
       type: 'string',
       description: 'Required when selectionMode is single_face.',
       example: 'f4fdba79-09ec-44c4-8d95-61f4f61d282b',
+    },
+    faceIds: {
+      type: 'array',
+      description: 'Required when selectionMode is selected_faces.',
+      items: { type: 'string' },
+      example: [
+        'f4fdba79-09ec-44c4-8d95-61f4f61d282b',
+        '6c01c2dd-2734-4dd2-8ff6-5d31a86336e0',
+      ],
     },
   },
 };

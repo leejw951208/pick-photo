@@ -124,6 +124,65 @@ describe('Photos workflow', () => {
     expect(response.body.errorCategory).toBe('selection_invalid');
   });
 
+  it('generates selected faces when faceIds belong to the upload', async () => {
+    const upload = await request(app.getHttpServer())
+      .post('/photos/uploads')
+      .attach('photo', Buffer.from('fake-image'), 'person.jpg')
+      .expect(201);
+
+    const faces = await request(app.getHttpServer())
+      .get(`/photos/uploads/${upload.body.uploadId}/faces`)
+      .expect(200);
+
+    const selectedFaceId = faces.body.faces[0].id;
+
+    const generation = await request(app.getHttpServer())
+      .post(`/photos/uploads/${upload.body.uploadId}/generations`)
+      .send({
+        selectionMode: 'selected_faces',
+        faceIds: [selectedFaceId],
+      })
+      .expect(201);
+
+    const result = await request(app.getHttpServer())
+      .get(`/photos/generations/${generation.body.generationId}`)
+      .expect(200);
+
+    expect(result.body.results).toHaveLength(1);
+    expect(result.body.results[0].faceId).toBe(selectedFaceId);
+  });
+
+  it('rejects selected-face generation without face ids', async () => {
+    const upload = await request(app.getHttpServer())
+      .post('/photos/uploads')
+      .attach('photo', Buffer.from('fake-image'), 'person.jpg')
+      .expect(201);
+
+    const response = await request(app.getHttpServer())
+      .post(`/photos/uploads/${upload.body.uploadId}/generations`)
+      .send({ selectionMode: 'selected_faces', faceIds: [] })
+      .expect(400);
+
+    expect(response.body.errorCategory).toBe('selection_invalid');
+  });
+
+  it('rejects selected-face generation when a face id does not belong to the upload', async () => {
+    const upload = await request(app.getHttpServer())
+      .post('/photos/uploads')
+      .attach('photo', Buffer.from('fake-image'), 'person.jpg')
+      .expect(201);
+
+    const response = await request(app.getHttpServer())
+      .post(`/photos/uploads/${upload.body.uploadId}/generations`)
+      .send({
+        selectionMode: 'selected_faces',
+        faceIds: ['another-upload-face-0'],
+      })
+      .expect(400);
+
+    expect(response.body.errorCategory).toBe('selection_invalid');
+  });
+
   it('rejects generation for an unknown upload', async () => {
     const response = await request(app.getHttpServer())
       .post('/photos/uploads/upload-missing/generations')

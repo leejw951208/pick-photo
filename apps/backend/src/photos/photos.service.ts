@@ -181,10 +181,12 @@ export class PhotosService {
   ): DetectedFaceDto[] {
     if (
       request.selectionMode !== 'single_face' &&
+      request.selectionMode !== 'selected_faces' &&
       request.selectionMode !== 'all_faces'
     ) {
       throw new BadRequestException({
-        message: 'selectionMode must be single_face or all_faces.',
+        message:
+          'selectionMode must be single_face, selected_faces, or all_faces.',
         errorCategory: 'selection_invalid',
       });
     }
@@ -193,22 +195,47 @@ export class PhotosService {
       return faces;
     }
 
-    if (!request.faceId) {
+    if (request.selectionMode === 'single_face') {
+      if (!request.faceId) {
+        throw new BadRequestException({
+          message: 'faceId is required when selectionMode is single_face.',
+          errorCategory: 'selection_invalid',
+        });
+      }
+
+      const selectedFace = faces.find((face) => face.id === request.faceId);
+      if (!selectedFace) {
+        throw new BadRequestException({
+          message: 'faceId does not belong to the upload.',
+          errorCategory: 'selection_invalid',
+        });
+      }
+
+      return [selectedFace];
+    }
+
+    const requestedFaceIds = Array.from(new Set(request.faceIds ?? []));
+    if (requestedFaceIds.length === 0) {
       throw new BadRequestException({
-        message: 'faceId is required when selectionMode is single_face.',
+        message:
+          'faceIds must include at least one face when selectionMode is selected_faces.',
         errorCategory: 'selection_invalid',
       });
     }
 
-    const selectedFace = faces.find((face) => face.id === request.faceId);
-    if (!selectedFace) {
-      throw new BadRequestException({
-        message: 'faceId does not belong to the upload.',
-        errorCategory: 'selection_invalid',
-      });
-    }
+    const selectedFaces = requestedFaceIds.map((faceId) => {
+      const face = faces.find((candidate) => candidate.id === faceId);
+      if (!face) {
+        throw new BadRequestException({
+          message: 'faceIds must belong to the upload.',
+          errorCategory: 'selection_invalid',
+        });
+      }
 
-    return [selectedFace];
+      return face;
+    });
+
+    return selectedFaces;
   }
 
   private toStoredFaces(faces: DetectedFaceDto[]): DetectedFaceDto[] {
