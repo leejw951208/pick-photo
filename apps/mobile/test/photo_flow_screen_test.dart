@@ -185,13 +185,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('얼굴 1 제외됨'), findsOneWidget);
-    expect(find.text('선택한 얼굴 0명'), findsOneWidget);
 
     await tester.tap(find.text('얼굴 1 제외됨'));
     await tester.pumpAndSettle();
 
     expect(find.text('얼굴 1 선택됨'), findsOneWidget);
-    expect(find.text('선택한 얼굴 1명'), findsOneWidget);
   });
 }
 

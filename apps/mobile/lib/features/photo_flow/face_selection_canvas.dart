@@ -121,8 +121,6 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SelectionSummary(selectedCount: widget.selectedFaceIds.length),
-        const SizedBox(height: 8),
         _ZoomControls(
           onZoomIn: () => _scaleBy(1.25),
           onZoomOut: () => _scaleBy(0.8),
@@ -342,20 +340,6 @@ class _ZoomControls extends StatelessWidget {
           child: const Text('원본'),
         ),
       ],
-    );
-  }
-}
-
-class _SelectionSummary extends StatelessWidget {
-  const _SelectionSummary({required this.selectedCount});
-
-  final int selectedCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '선택한 얼굴 $selectedCount명',
-      style: Theme.of(context).textTheme.titleMedium,
     );
   }
 }
