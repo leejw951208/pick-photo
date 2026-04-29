@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -193,6 +194,182 @@ void main() {
         findsOneWidget);
     expect(find.text('https://example.invalid/results/face-2.jpg'),
         findsOneWidget);
+  });
+
+  testWidgets('stale first upload does not override a later upload',
+      (tester) async {
+    final api = ControllablePhotoFlowApi();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: SequencePhotoPicker(['first.jpg', 'second.jpg']),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pump();
+    await tester.tap(find.text('사진 선택'));
+    await tester.pump();
+
+    api.completeUpload(
+      'second.jpg',
+      const FaceDetectionResult(
+        uploadId: 'upload-second',
+        faces: [
+          DetectedFace(
+            id: 'face-second',
+            faceIndex: 1,
+            box: FaceBox(left: 0.65, top: 0.1, width: 0.25, height: 0.35),
+            confidence: 0.96,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('얼굴 2 제외됨'), findsOneWidget);
+
+    api.completeUpload(
+      'first.jpg',
+      const FaceDetectionResult(
+        uploadId: 'upload-first',
+        faces: [
+          DetectedFace(
+            id: 'face-first',
+            faceIndex: 0,
+            box: FaceBox(left: 0.05, top: 0.1, width: 0.25, height: 0.35),
+            confidence: 0.98,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('얼굴 2 제외됨'), findsOneWidget);
+    expect(find.text('얼굴 1 제외됨'), findsNothing);
+  });
+
+  testWidgets('stale generation does not populate results after a new upload',
+      (tester) async {
+    final api = ControllablePhotoFlowApi();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: SequencePhotoPicker(['first.jpg', 'second.jpg']),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pump();
+    api.completeUpload(
+      'first.jpg',
+      const FaceDetectionResult(
+        uploadId: 'upload-first',
+        faces: [
+          DetectedFace(
+            id: 'face-first',
+            faceIndex: 0,
+            box: FaceBox(left: 0.05, top: 0.1, width: 0.25, height: 0.35),
+            confidence: 0.98,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('얼굴 1 제외됨'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
+    await tester.pump();
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pump();
+    api.completeUpload(
+      'second.jpg',
+      const FaceDetectionResult(
+        uploadId: 'upload-second',
+        faces: [
+          DetectedFace(
+            id: 'face-second',
+            faceIndex: 1,
+            box: FaceBox(left: 0.65, top: 0.1, width: 0.25, height: 0.35),
+            confidence: 0.96,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    api.completeGeneration(
+      'upload-first',
+      const [
+        GeneratedPhoto(
+          id: 'generated-face-first',
+          faceId: 'face-first',
+          url: 'https://example.invalid/results/face-first.jpg',
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('얼굴 2 제외됨'), findsOneWidget);
+    expect(find.text('Generated result for face-first'), findsNothing);
+    expect(find.text('생성이 완료되었습니다'), findsNothing);
+  });
+
+  testWidgets('keeps canvas zoom when selection changes', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: FakePhotoFlowApi(),
+          photoPicker: FixedPhotoPicker('person.jpg'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('확대'));
+    await tester.pump();
+
+    final zoomedScale = canvasScale(tester);
+
+    await tester.tap(find.text('전체 선택'));
+    await tester.pump();
+
+    expect(canvasScale(tester), zoomedScale);
+  });
+
+  testWidgets('shows many generated results without small viewport overflow',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final api = ManyFacePhotoFlowApi(faceCount: 8);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PhotoFlowScreen(
+          api: api,
+          photoPicker: FixedPhotoPicker('person.jpg'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('사진 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('전체 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('선택한 얼굴 생성'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('생성이 완료되었습니다'), findsOneWidget);
+    expect(find.text('Generated result for face-1'), findsOneWidget);
   });
 
   testWidgets('toggles a face from the direct selection canvas',
@@ -404,6 +581,24 @@ class FixedPhotoPicker implements PhotoPicker {
   }
 }
 
+class SequencePhotoPicker implements PhotoPicker {
+  SequencePhotoPicker(this.names);
+
+  final List<String> names;
+  int _nextIndex = 0;
+
+  @override
+  Future<LocalPhotoFile?> pickPhoto() async {
+    final name = names[_nextIndex];
+    _nextIndex += 1;
+    return LocalPhotoFile(
+      name: name,
+      bytes: onePixelPngBytes(),
+      contentType: 'image/png',
+    );
+  }
+}
+
 Uint8List onePixelPngBytes() {
   return Uint8List.fromList([
     137,
@@ -565,5 +760,78 @@ class MultiFacePhotoFlowApi implements PhotoFlowApi {
           ),
         )
         .toList();
+  }
+}
+
+class ManyFacePhotoFlowApi implements PhotoFlowApi {
+  ManyFacePhotoFlowApi({required this.faceCount});
+
+  final int faceCount;
+
+  @override
+  Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
+    return FaceDetectionResult(
+      uploadId: 'upload-1',
+      faces: [
+        for (var index = 0; index < faceCount; index += 1)
+          DetectedFace(
+            id: 'face-${index + 1}',
+            faceIndex: index,
+            box: FaceBox(
+              left: 0.05 + (index % 4) * 0.22,
+              top: 0.1 + (index ~/ 4) * 0.3,
+              width: 0.16,
+              height: 0.22,
+            ),
+            confidence: 0.9,
+          ),
+      ],
+    );
+  }
+
+  @override
+  Future<List<GeneratedPhoto>> generateForFaces(
+    String uploadId,
+    Set<String> faceIds,
+  ) async {
+    return faceIds
+        .map(
+          (faceId) => GeneratedPhoto(
+            id: 'generated-$faceId',
+            faceId: faceId,
+            url: 'https://example.invalid/results/$faceId.jpg',
+          ),
+        )
+        .toList();
+  }
+}
+
+class ControllablePhotoFlowApi implements PhotoFlowApi {
+  final Map<String, Completer<FaceDetectionResult>> _uploadCompleters = {};
+  final Map<String, Completer<List<GeneratedPhoto>>> _generationCompleters = {};
+
+  @override
+  Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) {
+    final completer = Completer<FaceDetectionResult>();
+    _uploadCompleters[photo.name] = completer;
+    return completer.future;
+  }
+
+  @override
+  Future<List<GeneratedPhoto>> generateForFaces(
+    String uploadId,
+    Set<String> faceIds,
+  ) {
+    final completer = Completer<List<GeneratedPhoto>>();
+    _generationCompleters[uploadId] = completer;
+    return completer.future;
+  }
+
+  void completeUpload(String photoName, FaceDetectionResult result) {
+    _uploadCompleters[photoName]!.complete(result);
+  }
+
+  void completeGeneration(String uploadId, List<GeneratedPhoto> results) {
+    _generationCompleters[uploadId]!.complete(results);
   }
 }

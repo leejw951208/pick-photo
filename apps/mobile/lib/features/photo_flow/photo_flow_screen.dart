@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,9 @@ class PhotoFlowScreen extends StatefulWidget {
 
 class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   PhotoFlowState state = const PhotoFlowState.initial();
+  int _uploadSequence = 0;
+  int _generationSequence = 0;
+  Uint8List? _sourcePhotoBytes;
 
   Future<void> _pickAndUploadPhoto() async {
     final photo = await widget.photoPicker.pickPhoto();
@@ -34,7 +38,12 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
   }
 
   Future<void> _uploadPhoto(LocalPhotoFile photo) async {
+    final uploadSequence = _uploadSequence + 1;
+    _uploadSequence = uploadSequence;
+    _generationSequence += 1;
+
     setState(() {
+      _sourcePhotoBytes = null;
       state = state.copyWith(
         stage: PhotoFlowStage.uploading,
         faces: const [],
@@ -50,11 +59,12 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
     try {
       detectionResult = await widget.api.uploadAndDetectFaces(photo);
     } catch (_) {
-      if (!mounted) {
+      if (!mounted || !_isCurrentUpload(uploadSequence)) {
         return;
       }
 
       setState(() {
+        _sourcePhotoBytes = null;
         state = state.copyWith(
           stage: PhotoFlowStage.failed,
           faces: const [],
@@ -68,11 +78,12 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
       return;
     }
 
-    if (!mounted) {
+    if (!mounted || !_isCurrentUpload(uploadSequence)) {
       return;
     }
 
     setState(() {
+      _sourcePhotoBytes = Uint8List.fromList(photo.bytes);
       state = detectionResult.faces.isEmpty
           ? state.copyWith(
               stage: PhotoFlowStage.failed,
@@ -93,6 +104,15 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
               message: '사진에서 얼굴을 선택해 주세요',
             );
     });
+  }
+
+  bool _isCurrentUpload(int uploadSequence) {
+    return uploadSequence == _uploadSequence;
+  }
+
+  bool _isCurrentGeneration(int generationSequence, String uploadId) {
+    return generationSequence == _generationSequence &&
+        state.uploadId == uploadId;
   }
 
   void _toggleFace(String faceId) {
@@ -153,6 +173,9 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
       return;
     }
 
+    final generationSequence = _generationSequence + 1;
+    _generationSequence = generationSequence;
+
     setState(() {
       state = state.copyWith(
         stage: PhotoFlowStage.generating,
@@ -166,7 +189,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
     try {
       results = await widget.api.generateForFaces(uploadId, faceIds);
     } catch (_) {
-      if (!mounted) {
+      if (!mounted || !_isCurrentGeneration(generationSequence, uploadId)) {
         return;
       }
 
@@ -180,7 +203,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
       return;
     }
 
-    if (!mounted) {
+    if (!mounted || !_isCurrentGeneration(generationSequence, uploadId)) {
       return;
     }
 
@@ -195,7 +218,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sourcePhotoBytes = state.sourcePhotoBytes;
+    final sourcePhotoBytes = _sourcePhotoBytes;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Pick Photo')),
@@ -217,26 +240,38 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final canvasHeight =
-                          math.max(120.0, constraints.maxHeight - 120);
                       final canvasWidth = math.min(
                         constraints.maxWidth,
-                        canvasHeight * 4 / 5,
+                        360.0,
                       );
 
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: SizedBox(
-                          width: canvasWidth,
-                          child: FaceSelectionCanvas(
-                            photoBytes: sourcePhotoBytes,
-                            faces: state.faces,
-                            selectedFaceIds: state.selectedFaceIds,
-                            onFaceToggled: _toggleFace,
+                      return SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: SizedBox(
+                            width: canvasWidth,
+                            child: FaceSelectionCanvas(
+                              photoBytes: sourcePhotoBytes,
+                              faces: state.faces,
+                              selectedFaceIds: state.selectedFaceIds,
+                              onFaceToggled: _toggleFace,
+                            ),
                           ),
                         ),
                       );
                     },
+                  ),
+                )
+              else if (state.results.isNotEmpty)
+                Expanded(
+                  child: ListView(
+                    children: [
+                      for (final result in state.results)
+                        ListTile(
+                          title: Text('Generated result for ${result.faceId}'),
+                          subtitle: Text(result.url),
+                        ),
+                    ],
                   ),
                 )
               else
@@ -248,11 +283,6 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
                   onSelectAll: _selectAllFaces,
                   onClear: _clearSelection,
                   onGenerate: _generateSelectedFaces,
-                ),
-              for (final result in state.results)
-                ListTile(
-                  title: Text('Generated result for ${result.faceId}'),
-                  subtitle: Text(result.url),
                 ),
             ],
           ),
