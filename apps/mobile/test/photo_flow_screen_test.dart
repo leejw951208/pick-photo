@@ -191,6 +191,81 @@ void main() {
 
     expect(find.text('얼굴 1 선택됨'), findsOneWidget);
   });
+
+  testWidgets('keeps small face labels readable', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 240,
+            child: FaceSelectionCanvas(
+              photoBytes: onePixelPngBytes(),
+              faces: const [
+                DetectedFace(
+                  id: 'face-1',
+                  faceIndex: 0,
+                  box: FaceBox(left: 0.4, top: 0.4, width: 0.05, height: 0.05),
+                  confidence: 0.98,
+                ),
+              ],
+              selectedFaceIds: const {},
+              onFaceToggled: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await pumpDecodedCanvas(tester);
+
+    final label = find.text('얼굴 1 제외됨');
+
+    expect(label, findsOneWidget);
+    expect(tester.getSize(label).width, greaterThan(44));
+  });
+
+  testWidgets('clamps zoom controls to gesture scale range', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 240,
+            child: FaceSelectionCanvas(
+              photoBytes: onePixelPngBytes(),
+              faces: const [],
+              selectedFaceIds: const {},
+              onFaceToggled: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await pumpDecodedCanvas(tester);
+
+    for (var index = 0; index < 12; index += 1) {
+      await tester.tap(find.text('확대'));
+      await tester.pump();
+    }
+    expect(canvasScale(tester), closeTo(6, 0.001));
+
+    for (var index = 0; index < 20; index += 1) {
+      await tester.tap(find.text('축소'));
+      await tester.pump();
+    }
+    expect(canvasScale(tester), closeTo(1, 0.001));
+  });
+}
+
+Future<void> pumpDecodedCanvas(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+  });
+  await tester.pump();
+  await tester.pumpAndSettle();
+}
+
+double canvasScale(WidgetTester tester) {
+  final transform = tester.widget<Transform>(find.byType(Transform).last);
+  return transform.transform.getMaxScaleOnAxis();
 }
 
 class FixedPhotoPicker implements PhotoPicker {

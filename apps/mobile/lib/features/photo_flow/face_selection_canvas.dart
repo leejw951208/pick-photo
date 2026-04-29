@@ -25,9 +25,13 @@ class FaceSelectionCanvas extends StatefulWidget {
 }
 
 class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
+  static const _minScale = 1.0;
+  static const _maxScale = 6.0;
+
   final TransformationController _controller = TransformationController();
   Size? _imageSize;
   Object? _decodeError;
+  int _decodeGeneration = 0;
 
   @override
   void initState() {
@@ -51,18 +55,22 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
   }
 
   Future<void> _decodeImage() async {
+    final generation = _decodeGeneration + 1;
+    _decodeGeneration = generation;
+    final photoBytes = widget.photoBytes;
+
     try {
-      final pngSize = _tryReadPngSize(widget.photoBytes);
-      if (pngSize != null && mounted) {
+      final pngSize = _tryReadPngSize(photoBytes);
+      if (pngSize != null && _isCurrentDecode(generation, photoBytes)) {
         setState(() {
           _imageSize = pngSize;
           _decodeError = null;
         });
       }
 
-      final codec = await ui.instantiateImageCodec(widget.photoBytes);
+      final codec = await ui.instantiateImageCodec(photoBytes);
       final frame = await codec.getNextFrame();
-      if (!mounted) {
+      if (!_isCurrentDecode(generation, photoBytes)) {
         frame.image.dispose();
         codec.dispose();
         return;
@@ -77,7 +85,7 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
       frame.image.dispose();
       codec.dispose();
     } catch (error) {
-      if (!mounted) {
+      if (!_isCurrentDecode(generation, photoBytes)) {
         return;
       }
       if (_imageSize != null) {
@@ -88,6 +96,12 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
         _decodeError = error;
       });
     }
+  }
+
+  bool _isCurrentDecode(int generation, Uint8List photoBytes) {
+    return mounted &&
+        generation == _decodeGeneration &&
+        identical(photoBytes, widget.photoBytes);
   }
 
   Size? _tryReadPngSize(Uint8List bytes) {
@@ -147,8 +161,8 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
 
                   return InteractiveViewer(
                     transformationController: _controller,
-                    minScale: 1,
-                    maxScale: 6,
+                    minScale: _minScale,
+                    maxScale: _maxScale,
                     child: SizedBox(
                       width: viewport.width,
                       height: viewport.height,
@@ -213,7 +227,19 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
   }
 
   void _scaleBy(double factor) {
-    _controller.value = _controller.value.scaled(factor, factor, 1);
+    final currentScale = _controller.value.getMaxScaleOnAxis();
+    if (currentScale <= 0) {
+      _resetZoom();
+      return;
+    }
+
+    final targetScale = (currentScale * factor).clamp(_minScale, _maxScale);
+    final appliedFactor = targetScale / currentScale;
+    _controller.value = _controller.value.scaled(
+      appliedFactor,
+      appliedFactor,
+      1,
+    );
   }
 
   void _resetZoom() {
@@ -234,6 +260,9 @@ class _FaceMarker extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  static const _minTapTargetSize = 44.0;
+  static const _minLabelWidth = 92.0;
+
   @override
   Widget build(BuildContext context) {
     final label = '얼굴 ${face.faceIndex + 1} ${selected ? '선택됨' : '제외됨'}';
@@ -243,8 +272,11 @@ class _FaceMarker extends StatelessWidget {
     return Positioned(
       left: rect.left - 8,
       top: rect.top - 8,
-      width: math.max(rect.width + 16, 44),
-      height: math.max(rect.height + 16, 44),
+      width: math.max(
+        math.max(rect.width + 16, _minTapTargetSize),
+        _minLabelWidth,
+      ),
+      height: math.max(rect.height + 16, _minTapTargetSize),
       child: Semantics(
         button: true,
         selected: selected,
