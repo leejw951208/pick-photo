@@ -24,6 +24,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('사진에서 얼굴을 선택해 주세요'), findsOneWidget);
+    expect(find.text('얼굴을 직접 선택하세요'), findsOneWidget);
     expect(find.text('얼굴 1 제외됨'), findsOneWidget);
     expect(find.text('선택한 얼굴 0명 / 전체 1명'), findsOneWidget);
   });
@@ -63,7 +64,7 @@ void main() {
     expect(find.text('업로드에 실패했습니다. 다시 시도해 주세요'), findsOneWidget);
     expect(find.text('얼굴 1 제외됨'), findsNothing);
     expect(find.text('선택한 얼굴 생성'), findsNothing);
-    expect(find.textContaining('Generated result'), findsNothing);
+    expect(find.text('얼굴 1 결과'), findsNothing);
   });
 
   testWidgets('shows generated result after selecting a face', (tester) async {
@@ -86,8 +87,8 @@ void main() {
 
     expect(api.generatedFaceIds, {'face-1'});
     expect(find.text('생성이 완료되었습니다'), findsOneWidget);
-    expect(find.text('Generated result for face-1'), findsOneWidget);
-    expect(find.text('Generated result for face-2'), findsNothing);
+    expect(find.text('얼굴 1 결과'), findsOneWidget);
+    expect(find.text('얼굴 2 결과'), findsNothing);
     expect(
       find.text('https://example.invalid/results/face-1.jpg'),
       findsOneWidget,
@@ -114,7 +115,7 @@ void main() {
 
     expect(find.text('생성에 실패했습니다. 다시 시도해 주세요'), findsOneWidget);
     expect(find.text('선택한 얼굴 1명 / 전체 1명'), findsOneWidget);
-    expect(find.textContaining('Generated result'), findsNothing);
+    expect(find.text('얼굴 1 결과'), findsNothing);
   });
 
   testWidgets('generates only directly selected faces', (tester) async {
@@ -138,8 +139,8 @@ void main() {
 
     expect(api.generatedFaceIds, {'face-1'});
     expect(find.text('생성이 완료되었습니다'), findsOneWidget);
-    expect(find.text('Generated result for face-1'), findsOneWidget);
-    expect(find.text('Generated result for face-2'), findsNothing);
+    expect(find.text('얼굴 1 결과'), findsOneWidget);
+    expect(find.text('얼굴 2 결과'), findsNothing);
   });
 
   testWidgets(
@@ -188,8 +189,8 @@ void main() {
 
     expect(api.generatedFaceIds, unorderedEquals(['face-1', 'face-2']));
     expect(find.text('생성이 완료되었습니다'), findsOneWidget);
-    expect(find.text('Generated result for face-1'), findsOneWidget);
-    expect(find.text('Generated result for face-2'), findsOneWidget);
+    expect(find.text('얼굴 1 결과'), findsOneWidget);
+    expect(find.text('얼굴 2 결과'), findsOneWidget);
     expect(find.text('https://example.invalid/results/face-1.jpg'),
         findsOneWidget);
     expect(find.text('https://example.invalid/results/face-2.jpg'),
@@ -317,7 +318,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('얼굴 2 제외됨'), findsOneWidget);
-    expect(find.text('Generated result for face-first'), findsNothing);
+    expect(find.text('선택 얼굴 결과'), findsNothing);
     expect(find.text('생성이 완료되었습니다'), findsNothing);
   });
 
@@ -373,7 +374,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Generated result for face-1'), findsOneWidget);
+    expect(find.text('얼굴 1 결과'), findsOneWidget);
     expect(find.text('선택한 얼굴 1명 / 전체 1명'), findsOneWidget);
   });
 
@@ -425,7 +426,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('생성이 완료되었습니다'), findsOneWidget);
-    expect(find.text('Generated result for face-1'), findsOneWidget);
+    expect(find.text('얼굴 1 결과'), findsOneWidget);
   });
 
   testWidgets('toggles a face from the direct selection canvas',

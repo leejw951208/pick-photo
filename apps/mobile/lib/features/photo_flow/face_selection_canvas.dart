@@ -260,7 +260,7 @@ class _FaceMarker extends StatelessWidget {
   final VoidCallback onTap;
 
   static const _minTapTargetSize = 44.0;
-  static const _minLabelWidth = 92.0;
+  static const _minLabelWidth = 132.0;
 
   @override
   Widget build(BuildContext context) {
@@ -303,24 +303,28 @@ class _FaceMarker extends StatelessWidget {
                 ),
                 Align(
                   alignment: Alignment.topLeft,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? const Color(0xFF2FBF71)
-                          : const Color(0xFF111827),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                  child: GestureDetector(
+                    onTap: onTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? const Color(0xFF2FBF71)
+                            : const Color(0xFF111827),
+                        borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Text(
-                        label,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        child: Text(
+                          label,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -350,27 +354,35 @@ class _ZoomControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        OutlinedButton(
-          onPressed: onZoomIn,
-          child: const Text('확대'),
-        ),
-        OutlinedButton(
-          onPressed: onZoomOut,
-          child: const Text('축소'),
-        ),
-        OutlinedButton(
-          onPressed: onFit,
-          child: const Text('맞춤'),
-        ),
-        OutlinedButton(
-          onPressed: onOriginal,
-          child: const Text('원본'),
-        ),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          OutlinedButton.icon(
+            onPressed: onZoomIn,
+            icon: const Icon(Icons.zoom_in_outlined),
+            label: const Text('확대'),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: onZoomOut,
+            icon: const Icon(Icons.zoom_out_outlined),
+            label: const Text('축소'),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: onFit,
+            icon: const Icon(Icons.fit_screen_outlined),
+            label: const Text('맞춤'),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: onOriginal,
+            icon: const Icon(Icons.center_focus_strong_outlined),
+            label: const Text('원본'),
+          ),
+        ],
+      ),
     );
   }
 }
