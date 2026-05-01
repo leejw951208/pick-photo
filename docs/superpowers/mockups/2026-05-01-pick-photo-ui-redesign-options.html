@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pick Photo UI Redesign Options</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #11100f;
+      --muted: #716b64;
+      --paper: #f7f3ec;
+      --line: rgba(28, 25, 23, 0.12);
+      --gold: #c58a2f;
+      --mint: #3bd6a2;
+      --blue: #6ea8fe;
+      --coral: #ff8a7a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.78), rgba(247, 243, 236, 0.82)),
+        #f4efe6;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1420px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 36px 0 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .eyebrow {
+      color: #8b5d1f;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin-top: 8px;
+      font-size: clamp(32px, 4vw, 58px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .option {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.66);
+      box-shadow: 0 22px 60px rgba(60, 45, 25, 0.12);
+    }
+
+    .option.recommended {
+      border-color: rgba(197, 138, 47, 0.5);
+      background: rgba(255, 250, 240, 0.82);
+    }
+
+    .option-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 82px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(17, 16, 15, 0.08);
+      color: #403932;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .recommended .tag {
+      background: rgba(197, 138, 47, 0.16);
+      color: #754a0b;
+    }
+
+    h2 {
+      font-size: 23px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .option-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .phone {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 390 / 820;
+      border-radius: 34px;
+      border: 10px solid #171412;
+      box-shadow: 0 32px 70px rgba(33, 24, 15, 0.32);
+    }
+
+    .screen {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 24px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      font-weight: 900;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      color: #15110e;
+      background: linear-gradient(135deg, #fff4cf, #f0b851);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      min-height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .hero {
+      padding: 18px;
+      border-radius: 24px;
+    }
+
+    .hero h3 {
+      font-size: 31px;
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .stepper {
+      display: flex;
+      gap: 7px;
+      overflow: hidden;
+    }
+
+    .step {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 9px 8px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 850;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .photo-stage {
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+      border-radius: 26px;
+    }
+
+    .portrait {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255, 232, 204, 0.94) 0 13%, transparent 14%),
+        radial-gradient(ellipse at 50% 58%, rgba(35, 31, 28, 0.7) 0 27%, transparent 28%),
+        linear-gradient(135deg, #53606f, #c3d4de 42%, #ede3d5);
+    }
+
+    .group-photo {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 28% 33%, #f3c5aa 0 8%, transparent 9%),
+        radial-gradient(circle at 60% 29%, #e8b591 0 7%, transparent 8%),
+        radial-gradient(circle at 74% 47%, #f2c9af 0 6%, transparent 7%),
+        radial-gradient(ellipse at 28% 58%, #2b2d36 0 16%, transparent 17%),
+        radial-gradient(ellipse at 60% 54%, #525d69 0 17%, transparent 18%),
+        radial-gradient(ellipse at 74% 67%, #3e3b35 0 15%, transparent 16%),
+        linear-gradient(135deg, #b8c6d0, #f2e7d5);
+    }
+
+    .face-box {
+      position: absolute;
+      border-radius: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+    }
+
+    .face-box.selected {
+      border-color: var(--mint);
+      background: rgba(59, 214, 162, 0.12);
+    }
+
+    .face-box.warn {
+      border-color: #f6ba4b;
+      border-style: dashed;
+      background: rgba(246, 186, 75, 0.13);
+    }
+
+    .face-label {
+      position: absolute;
+      top: -14px;
+      left: -6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: #11100f;
+      background: #f8f0da;
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+    }
+
+    .summary {
+      display: grid;
+      gap: 11px;
+      padding: 13px;
+      border-radius: 22px;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .summary strong {
+      font-size: 16px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 8px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .mini-results {
+      display: grid;
+      grid-template-columns: 0.8fr 1fr;
+      gap: 10px;
+      min-height: 132px;
+    }
+
+    .result-photo {
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 50% 25%, #f2c5a4 0 18%, transparent 19%),
+        radial-gradient(ellipse at 50% 67%, #22262e 0 31%, transparent 32%),
+        linear-gradient(180deg, #f5f5f1, #d8e5ef);
+    }
+
+    .result-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 22px;
+      padding: 14px;
+    }
+
+    .meta-line {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.18;
+    }
+
+    .meta-line.short {
+      width: 72%;
+    }
+
+    .studio .phone {
+      background: #15110e;
+    }
+
+    .studio .screen {
+      color: #fff8ec;
+      background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, #1b1714, #0f0d0b);
+    }
+
+    .studio .hero,
+    .studio .summary,
+    .studio .result-copy {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .studio .hero p,
+    .studio .summary small {
+      color: rgba(255, 248, 236, 0.68);
+    }
+
+    .studio .step {
+      color: rgba(255, 248, 236, 0.62);
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .studio .step.active {
+      color: #18120d;
+      background: #f1bf57;
+    }
+
+    .studio .photo-stage {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #211b18;
+    }
+
+    .studio .button.secondary {
+      color: #fff8ec;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .studio .button.primary {
+      color: #15110e;
+      background: linear-gradient(135deg, #ffe0a0, #e3a73a);
+      box-shadow: 0 14px 28px rgba(227, 167, 58, 0.24);
+    }
+
+    .editorial .phone {
+      border-color: #f1e7d7;
+      background: #fffaf2;
+    }
+
+    .editorial .screen {
+      color: #1c1917;
+      background: #fff7ec;
+    }
+
+    .editorial .mark {
+      background: #1c1917;
+      color: #fff7ec;
+    }
+
+    .editorial .ghost-button {
+      border-color: rgba(28, 25, 23, 0.14);
+      color: #1c1917;
+      background: #fff;
+    }
+
+    .editorial .hero {
+      color: #1c1917;
+      background: #f4dcbd;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+    }
+
+    .editorial .hero p {
+      color: rgba(28, 25, 23, 0.66);
+    }
+
+    .editorial .step {
+      color: #6f665c;
+      background: rgba(28, 25, 23, 0.07);
+    }
+
+    .editorial .step.active {
+      color: #fff7ec;
+      background: #1c1917;
+    }
+
+    .editorial .photo-stage {
+      background: #eee0cc;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+    }
+
+    .editorial .summary,
+    .editorial .result-copy {
+      background: #fffefb;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 16px 34px rgba(87, 61, 31, 0.11);
+    }
+
+    .editorial .button.secondary {
+      color: #1c1917;
+      background: #f4ecdf;
+    }
+
+    .editorial .button.primary {
+      color: #fff7ec;
+      background: #1c1917;
+    }
+
+    .clarity .phone {
+      border-color: #dfe7f5;
+      background: #f8fbff;
+    }
+
+    .clarity .screen {
+      color: #102033;
+      background:
+        linear-gradient(180deg, #eef7ff, #ffffff 38%),
+        #ffffff;
+    }
+
+    .clarity .mark {
+      background: linear-gradient(135deg, #79d7ff, #8ef0c4);
+      color: #102033;
+    }
+
+    .clarity .ghost-button {
+      border-color: rgba(16, 32, 51, 0.12);
+      color: #102033;
+      background: #ffffff;
+    }
+
+    .clarity .hero {
+      background: #eaf4ff;
+      border: 1px solid rgba(31, 93, 156, 0.11);
+    }
+
+    .clarity .hero p {
+      color: #55708c;
+    }
+
+    .clarity .step {
+      color: #6d8298;
+      background: #eef3f8;
+    }
+
+    .clarity .step.active {
+      color: #0f2437;
+      background: #a5f3d3;
+    }
+
+    .clarity .photo-stage {
+      border: 1px solid rgba(31, 93, 156, 0.13);
+      background: #dbe8f3;
+    }
+
+    .clarity .summary,
+    .clarity .result-copy {
+      background: #ffffff;
+      border: 1px solid rgba(31, 93, 156, 0.12);
+      box-shadow: 0 16px 38px rgba(55, 88, 124, 0.12);
+    }
+
+    .clarity .button.secondary {
+      color: #102033;
+      background: #edf5fd;
+    }
+
+    .clarity .button.primary {
+      color: #102033;
+      background: #83edc3;
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .note {
+      padding: 15px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    @media (max-width: 1120px) {
+      header {
+        display: block;
+      }
+
+      .lead {
+        margin-top: 14px;
+      }
+
+      .options,
+      .notes {
+        grid-template-columns: 1fr;
+      }
+
+      .phone {
+        max-width: 390px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      main {
+        width: min(100% - 24px, 420px);
+        padding-top: 24px;
+      }
+
+      .option {
+        padding: 12px;
+        border-radius: 14px;
+      }
+
+      .option-head {
+        display: block;
+        min-height: 0;
+      }
+
+      .tag {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Pick Photo redesign preview</p>
+        <h1>기능 중심 화면을 사진 앱다운 감각으로 바꾸는 3가지 방향</h1>
+      </div>
+      <p class="lead">
+        실제 구현 전 선택용 시안입니다. 공통 원칙은 원본 사진 직접 선택, 확대 선택, 하단 선택 요약을 유지하고
+        시각 언어만 더 트렌디하게 만드는 것입니다.
+      </p>
+    </header>
+
+    <section class="options" aria-label="리디자인 방향">
+      <article class="option recommended studio">
+        <div class="option-head">
+          <div>
+            <h2>A. Studio Glass</h2>
+            <p class="option-copy">추천. 사진 편집 앱처럼 몰입감 있는 어두운 캔버스와 골드 CTA, 민트 선택 상태를 사용합니다.</p>
+          </div>
+          <span class="tag">추천</span>
+        </div>
+        <div class="phone" aria-label="Studio Glass 모바일 시안">
+          <div class="screen">
+            <div class="status"><span>9:41</span><span>LTE 100%</span></div>
+            <div class="nav">
+              <div class="brand"><span class="mark">P</span><span>Pick Photo</span></div>
+              <span class="ghost-button">새 사진</span>
+            </div>
+            <section class="hero">
+              <h3>사진 속 얼굴을 스튜디오 결과로</h3>
+              <p>선택한 얼굴만 생성 대상으로 보냅니다. 결과는 저장 전에 확인합니다.</p>
+            </section>
+            <div class="stepper">
+              <span class="step">업로드</span>
+              <span class="step active">얼굴 선택 3명</span>
+              <span class="step">결과 확인</span>
+            </div>
+            <section class="photo-stage">
+              <div class="group-photo"></div>
+              <div class="face-box selected" style="left:20%;top:18%;width:26%;height:26%;">
+                <span class="face-label">얼굴 1 선택됨</span>
+              </div>
+              <div class="face-box" style="left:51%;top:16%;width:22%;height:24%;">
+                <span class="face-label">얼굴 2 제외됨</span>
+              </div>
+              <div class="face-box warn" style="left:66%;top:36%;width:20%;height:21%;">
+                <span class="face-label">확인 필요</span>
+              </div>
+            </section>
+            <section class="summary">
+              <div class="summary-row">
+                <strong>1명 선택됨</strong>
+                <small>전체 3명</small>
+              </div>
+              <div class="actions">
+                <span class="button secondary">전체 선택</span>
+                <span class="button primary">선택한 얼굴 생성</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+
+      <article class="option editorial">
+        <div class="option-head">
+          <div>
+            <h2>B. Warm Editorial</h2>
+            <p class="option-copy">크림, 블랙, 사진 잡지 느낌의 큼직한 타이포그래피. 부드럽고 프리미엄한 인상입니다.</p>
+          </div>
+          <span class="tag">프리미엄</span>
+        </div>
+        <div class="phone" aria-label="Warm Editorial 모바일 시안">
+          <div class="screen">
+            <div class="status"><span>9:41</span><span>LTE 100%</span></div>
+            <div class="nav">
+              <div class="brand"><span class="mark">P</span><span>Pick Photo</span></div>
+              <span class="ghost-button">재시도</span>
+            </div>
+            <section class="hero">
+              <h3>한 장의 사진에서 원하는 인물만</h3>
+              <p>얼굴을 직접 눌러 생성 대상을 확정하세요.</p>
+            </section>
+            <div class="stepper">
+              <span class="step active">업로드</span>
+              <span class="step">얼굴 선택</span>
+              <span class="step">결과 확인</span>
+            </div>
+            <section class="photo-stage">
+              <div class="portrait"></div>
+            </section>
+            <section class="summary">
+              <div class="summary-row">
+                <strong>사진을 선택하세요</strong>
+                <small>JPG, PNG</small>
+              </div>
+              <div class="actions">
+                <span class="button secondary">가이드</span>
+                <span class="button primary">사진 선택</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+
+      <article class="option clarity">
+        <div class="option-head">
+          <div>
+            <h2>C. Fresh Clarity</h2>
+            <p class="option-copy">밝은 민트/블루 중심의 신뢰감 있는 모바일 앱 톤. 접근성과 상태 명확성이 가장 강합니다.</p>
+          </div>
+          <span class="tag">명확함</span>
+        </div>
+        <div class="phone" aria-label="Fresh Clarity 모바일 시안">
+          <div class="screen">
+            <div class="status"><span>9:41</span><span>LTE 100%</span></div>
+            <div class="nav">
+              <div class="brand"><span class="mark">P</span><span>Pick Photo</span></div>
+              <span class="ghost-button">완료</span>
+            </div>
+            <section class="hero">
+              <h3>결과를 저장하기 전에 확인하세요</h3>
+              <p>선택된 얼굴별로 생성 결과를 분리해 보여줍니다.</p>
+            </section>
+            <div class="stepper">
+              <span class="step">업로드</span>
+              <span class="step">얼굴 선택</span>
+              <span class="step active">결과 확인</span>
+            </div>
+            <section class="mini-results">
+              <div class="result-photo"></div>
+              <div class="result-copy">
+                <strong>얼굴 1 결과</strong>
+                <span class="meta-line"></span>
+                <span class="meta-line short"></span>
+                <span class="button primary">확인 완료</span>
+              </div>
+            </section>
+            <section class="mini-results">
+              <div class="result-photo"></div>
+              <div class="result-copy">
+                <strong>얼굴 2 결과</strong>
+                <span class="meta-line"></span>
+                <span class="meta-line short"></span>
+                <span class="button secondary">다시 보기</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="notes" aria-label="시안 비교">
+      <p class="note">
+        <strong>A. Studio Glass</strong>
+        가장 트렌디하고 사진 앱처럼 보입니다. 현재 직접 선택 UX와 궁합이 좋아서, 실제 앱 구현 추천안입니다.
+      </p>
+      <p class="note">
+        <strong>B. Warm Editorial</strong>
+        브랜드가 고급스럽고 부드럽게 보입니다. 다만 얼굴 선택처럼 정확성이 중요한 화면에서는 대비를 조금 더 보강해야 합니다.
+      </p>
+      <p class="note">
+        <strong>C. Fresh Clarity</strong>
+        가장 안전하고 접근성이 좋습니다. 트렌디함은 A보다 약하지만 실패/결과 상태를 명확히 보여주기 좋습니다.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

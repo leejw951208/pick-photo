@@ -6,6 +6,16 @@ import 'package:flutter/material.dart';
 
 import 'photo_flow_state.dart';
 
+abstract final class _CanvasColors {
+  static const ink = Color(0xFF102033);
+  static const muted = Color(0xFF55708C);
+  static const blue = Color(0xFF2878C7);
+  static const paleBlue = Color(0xFFEAF4FF);
+  static const mint = Color(0xFF6EE7B7);
+  static const mintStrong = Color(0xFF22C58B);
+  static const line = Color(0xFFD6E4F2);
+}
+
 class FaceSelectionCanvas extends StatefulWidget {
   const FaceSelectionCanvas({
     super.key,
@@ -145,11 +155,12 @@ class _FaceSelectionCanvasState extends State<FaceSelectionCanvas> {
           aspectRatio: 4 / 5,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0xFF101820),
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFDCEAF7),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _CanvasColors.line),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(24),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final viewport = Size(
@@ -265,8 +276,9 @@ class _FaceMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = '얼굴 ${face.faceIndex + 1} ${selected ? '선택됨' : '제외됨'}';
-    final borderColor =
-        selected ? const Color(0xFF2FBF71) : const Color(0xFFE5E7EB);
+    final borderColor = selected ? _CanvasColors.mintStrong : Colors.white;
+    final labelColor = selected ? _CanvasColors.mint : _CanvasColors.ink;
+    final labelTextColor = selected ? _CanvasColors.ink : Colors.white;
 
     return Positioned(
       left: rect.left - 8,
@@ -284,7 +296,7 @@ class _FaceMarker extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
                 Positioned.fromRect(
@@ -297,7 +309,14 @@ class _FaceMarker extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       border: Border.all(color: borderColor, width: 3),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x3337587C),
+                          blurRadius: 18,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -308,10 +327,15 @@ class _FaceMarker extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: selected
-                            ? const Color(0xFF2FBF71)
-                            : const Color(0xFF111827),
+                        color: labelColor,
                         borderRadius: BorderRadius.circular(999),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x3337587C),
+                            blurRadius: 14,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -320,10 +344,10 @@ class _FaceMarker extends StatelessWidget {
                         ),
                         child: Text(
                           label,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: labelTextColor,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -354,34 +378,44 @@ class _ZoomControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            onPressed: onZoomIn,
-            icon: const Icon(Icons.zoom_in_outlined),
-            label: const Text('확대'),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: _CanvasColors.paleBlue,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _CanvasColors.line),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: onZoomIn,
+                icon: const Icon(Icons.zoom_in_outlined),
+                label: const Text('확대'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: onZoomOut,
+                icon: const Icon(Icons.zoom_out_outlined),
+                label: const Text('축소'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: onFit,
+                icon: const Icon(Icons.fit_screen_outlined),
+                label: const Text('맞춤'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: onOriginal,
+                icon: const Icon(Icons.center_focus_strong_outlined),
+                label: const Text('원본'),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: onZoomOut,
-            icon: const Icon(Icons.zoom_out_outlined),
-            label: const Text('축소'),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: onFit,
-            icon: const Icon(Icons.fit_screen_outlined),
-            label: const Text('맞춤'),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: onOriginal,
-            icon: const Icon(Icons.center_focus_strong_outlined),
-            label: const Text('원본'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -394,6 +428,25 @@ class _CanvasMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text(message));
+    return Center(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: _CanvasColors.paleBlue,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: _CanvasColors.line),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: _CanvasColors.muted,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ),
+      ),
+    );
   }
 }

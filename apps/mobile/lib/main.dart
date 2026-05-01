@@ -8,20 +8,41 @@ void main() {
   runApp(const PickPhotoApp());
 }
 
-class PickPhotoApp extends StatelessWidget {
+class PickPhotoApp extends StatefulWidget {
   const PickPhotoApp({super.key});
 
   @override
+  State<PickPhotoApp> createState() => _PickPhotoAppState();
+}
+
+class _PickPhotoAppState extends State<PickPhotoApp> {
+  late final PhotoFlowApi _api = NestPhotoFlowApi();
+  late final PhotoPicker _photoPicker = FilePickerPhotoPicker();
+
+  @override
+  void dispose() {
+    _api.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const seedColor = Color(0xFF0369A1);
+    const primary = Color(0xFF102033);
+    const secondary = Color(0xFF2878C7);
+    const accent = Color(0xFF6EE7B7);
+    const surface = Color(0xFFFFFFFF);
+    const scaffold = Color(0xFFF6FAFF);
+    const outline = Color(0xFFD6E4F2);
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
+      seedColor: secondary,
       brightness: Brightness.light,
     ).copyWith(
-      primary: seedColor,
-      secondary: const Color(0xFF2FBF71),
-      surface: Colors.white,
-      onSurface: const Color(0xFF020617),
+      primary: primary,
+      secondary: secondary,
+      tertiary: accent,
+      surface: surface,
+      onSurface: primary,
+      outline: outline,
     );
 
     return MaterialApp(
@@ -29,45 +50,52 @@ class PickPhotoApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: colorScheme,
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        scaffoldBackgroundColor: scaffold,
         appBarTheme: const AppBarTheme(
           centerTitle: false,
-          backgroundColor: Color(0xFFF8FAFC),
-          foregroundColor: Color(0xFF020617),
+          backgroundColor: scaffold,
+          foregroundColor: primary,
           elevation: 0,
+          surfaceTintColor: Colors.transparent,
         ),
         cardTheme: CardTheme(
-          color: Colors.white,
+          color: surface,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: outline),
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: seedColor,
-            foregroundColor: Colors.white,
+            backgroundColor: accent,
+            foregroundColor: primary,
             minimumSize: const Size(44, 44),
+            textStyle: const TextStyle(fontWeight: FontWeight.w800),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xFF0F172A),
+            backgroundColor: const Color(0xFFEAF4FF),
+            foregroundColor: primary,
             minimumSize: const Size(44, 44),
-            side: const BorderSide(color: Color(0xFFCBD5E1)),
+            side: const BorderSide(color: outline),
+            textStyle: const TextStyle(fontWeight: FontWeight.w800),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: secondary,
+        ),
       ),
       home: PhotoFlowScreen(
-        api: NestPhotoFlowApi(),
-        photoPicker: FilePickerPhotoPicker(),
+        api: _api,
+        photoPicker: _photoPicker,
       ),
     );
   }

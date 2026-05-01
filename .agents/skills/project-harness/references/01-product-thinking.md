@@ -1,35 +1,53 @@
 # Product Thinking
 
-Use this step before planning or implementing substantial work.
+Use this reference before planning or implementing substantial product, UI, API, data, workflow, or configuration work.
+
+## Product Baseline
+
+- Read `PRD.md` when it exists.
+- Treat `PRD.md` as the source for product intent, users, requirements, acceptance criteria, non-goals, assumptions, risks, and open product questions.
+- Keep `PRD.md` product-only; technical details belong in contracts, implementation plans, review notes, or harness guidance.
+- Do not create or modify `PRD.md` unless the user explicitly asks for a separate PRD task.
+- Do not treat unresolved PRD questions as verified repository facts.
+
+## Pick Photo Product Facts
+
+- The core flow is photo upload, face detection, face selection, ID-photo style generation, result review, failure recovery, and restart with a new photo.
+- Results must be generated only for selected faces.
+- Users must understand which faces are selected before generation.
+- Face and photo data are sensitive personal data.
+- The app must make upload, detection, generation, completion, failure, and retry states understandable.
+- One-photo-per-flow is the current product assumption.
+- Official country-specific ID-photo compliance, account-based long-term storage, payment, and editing tools are outside the current PRD scope unless a new product decision changes them.
+
+## Current Experience Anchors
+
+- Face review should prioritize original-photo direct face selection, with zoom/pan assistance for dense or small faces and a bottom selection summary instead of using a lower face list as the primary selection control.
+- The selected UI direction is Fresh Clarity: bright mint/blue, clearer status hierarchy, confidence-building chips and banners, and stronger result/failure states.
+- Fresh Clarity is a visual direction only; it must not imply new retention, deletion, API, AI, database, or policy behavior.
 
 ## Define The Change
 
 - State the user-visible or operator-visible outcome.
-- Identify affected users, workflows, UI, APIs, CLI behavior, library consumers, jobs, integrations, or configuration.
-- Separate required behavior from optional improvements.
+- Identify affected users, workflows, UI, APIs, contracts, background work, integrations, or configuration.
+- Separate required behavior from optional polish.
 - Name the smallest useful change that satisfies the request.
-
-## Align With Product Context
-
-- Read `PRD.md` when it exists before deciding product behavior.
-- Use verified product facts, requirements, scope, and open decisions from existing `PRD.md`.
-- If `PRD.md` is absent, do not create it unless the user explicitly asks for a separate PRD task.
-- Do not invent users, business rules, product goals, or features that are absent from existing `PRD.md` and repository evidence.
-- If existing `PRD.md` conflicts with repository evidence, prefer repository evidence and record the conflict as `Decision needed`.
+- Map new behavior to a PRD requirement, acceptance criterion, open decision, repository fact, or explicit user request.
 
 ## Identify Risk
 
 - Mark security-sensitive work early and read `security.md`.
 - Mark language/runtime or compatibility-sensitive work and read `language-runtime.md`.
-- Check whether the change touches public APIs, exported interfaces, request/response contracts, CLI behavior, configuration behavior, data shape, package metadata, module boundaries, generated types, or user data.
+- Check whether the change touches public APIs, request/response contracts, generated/client types, database schema, configuration behavior, sensitive data, or user-facing policy language.
+- If a PRD decision is unresolved, record `Decision needed` instead of filling the gap with product promises.
 
 ## Output
 
-Produce a short product note in Korean when written outside `.agents/`:
+For human-facing notes outside `.agents/`, write in Korean and include:
 
 - Goal
 - Non-goals
-- Product context alignment
+- PRD alignment
 - Verified repository context
-- Risks and security-sensitive areas
+- Security-sensitive areas
 - Open decisions

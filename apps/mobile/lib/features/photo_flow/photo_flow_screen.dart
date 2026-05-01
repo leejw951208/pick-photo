@@ -8,6 +8,18 @@ import 'photo_flow_api.dart';
 import 'photo_picker.dart';
 import 'photo_flow_state.dart';
 
+abstract final class _FreshColors {
+  static const ink = Color(0xFF102033);
+  static const muted = Color(0xFF55708C);
+  static const blue = Color(0xFF2878C7);
+  static const paleBlue = Color(0xFFEAF4FF);
+  static const mint = Color(0xFF6EE7B7);
+  static const mintStrong = Color(0xFF22C58B);
+  static const warning = Color(0xFFE09A2D);
+  static const line = Color(0xFFD6E4F2);
+  static const surface = Color(0xFFFFFFFF);
+}
+
 class PhotoFlowScreen extends StatefulWidget {
   const PhotoFlowScreen({
     super.key,
@@ -248,7 +260,7 @@ class _PhotoFlowScreenState extends State<PhotoFlowScreen> {
                 width: contentWidth,
                 height: constraints.maxHeight,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -342,19 +354,19 @@ class _FlowHeader extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        borderRadius: BorderRadius.circular(8),
+        color: _FreshColors.paleBlue,
+        border: Border.all(color: _FreshColors.line),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A0F172A),
-            blurRadius: 16,
-            offset: Offset(0, 8),
+            color: Color(0x1437587C),
+            blurRadius: 28,
+            offset: Offset(0, 16),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(compact ? 10 : 16),
+        padding: EdgeInsets.all(compact ? 12 : 18),
         child: compact
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -389,12 +401,12 @@ class _FlowHeader extends StatelessWidget {
                       _InfoPill(
                         icon: Icons.verified_user_outlined,
                         label: '선택한 얼굴만 생성됩니다',
-                        color: theme.colorScheme.primary,
+                        color: _FreshColors.blue,
                       ),
                       const _InfoPill(
                         icon: Icons.lock_outline,
                         label: '저장 전 결과 확인',
-                        color: Color(0xFF2FBF71),
+                        color: _FreshColors.mintStrong,
                       ),
                     ],
                   ),
@@ -402,16 +414,16 @@ class _FlowHeader extends StatelessWidget {
                   Text(
                     '사진 한 장으로 증명사진 스타일 결과를 만드세요',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: const Color(0xFF020617),
-                      fontWeight: FontWeight.w800,
-                      height: 1.18,
+                      color: _FreshColors.ink,
+                      fontWeight: FontWeight.w900,
+                      height: 1.12,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '원본 사진 위에서 얼굴을 직접 선택하고, 선택한 얼굴만 결과 생성 대상으로 보냅니다.',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF475569),
+                      color: _FreshColors.muted,
                       height: 1.45,
                     ),
                   ),
@@ -447,11 +459,14 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textColor =
+        color == _FreshColors.mintStrong ? _FreshColors.ink : color;
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withOpacity(0.18)),
+        border: Border.all(color: color.withOpacity(0.24)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -463,8 +478,8 @@ class _InfoPill extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: const Color(0xFF0F172A),
-                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                    fontWeight: FontWeight.w800,
                   ),
             ),
           ],
@@ -513,11 +528,15 @@ class _StageChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF0369A1) : const Color(0xFF64748B);
+    final textColor = active ? _FreshColors.ink : _FreshColors.muted;
+    final backgroundColor =
+        active ? _FreshColors.mint : const Color(0xFFEFF6FD);
+    final borderColor = active ? _FreshColors.mintStrong : _FreshColors.line;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: active ? const Color(0xFFE0F2FE) : const Color(0xFFF1F5F9),
+        color: backgroundColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Padding(
@@ -525,8 +544,8 @@ class _StageChip extends StatelessWidget {
         child: Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w700,
+                color: textColor,
+                fontWeight: FontWeight.w800,
               ),
         ),
       ),
@@ -543,19 +562,19 @@ class _StatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (stage) {
-      PhotoFlowStage.failed => const Color(0xFFB45309),
-      PhotoFlowStage.completed => const Color(0xFF047857),
-      _ => const Color(0xFF0369A1),
+      PhotoFlowStage.failed => _FreshColors.warning,
+      PhotoFlowStage.completed => _FreshColors.mintStrong,
+      _ => _FreshColors.blue,
     };
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        border: Border.all(color: color.withOpacity(0.18)),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withOpacity(0.12),
+        border: Border.all(color: color.withOpacity(0.24)),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(13),
         child: Row(
           children: [
             Icon(_statusIcon(stage), color: color, size: 20),
@@ -564,8 +583,8 @@ class _StatusBanner extends StatelessWidget {
               child: Text(
                 message,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF0F172A),
-                      fontWeight: FontWeight.w700,
+                      color: _FreshColors.ink,
+                      fontWeight: FontWeight.w800,
                     ),
               ),
             ),
@@ -591,6 +610,7 @@ class _StartGuidance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: const EdgeInsets.only(top: 2),
       children: const [
         _GuidanceRow(
           icon: Icons.photo_library_outlined,
@@ -629,16 +649,34 @@ class _GuidanceRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          color: _FreshColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: _FreshColors.line),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F37587C),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: const Color(0xFF0369A1)),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _FreshColors.paleBlue,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: _FreshColors.line),
+                ),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(icon, color: _FreshColors.blue, size: 22),
+                ),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -647,7 +685,7 @@ class _GuidanceRow extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: const Color(0xFF0F172A),
+                            color: _FreshColors.ink,
                             fontWeight: FontWeight.w800,
                           ),
                     ),
@@ -655,7 +693,7 @@ class _GuidanceRow extends StatelessWidget {
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: const Color(0xFF475569),
+                            color: _FreshColors.muted,
                             height: 1.4,
                           ),
                     ),
@@ -696,9 +734,16 @@ class _ReviewPanel extends StatelessWidget {
         Expanded(
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: _FreshColors.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _FreshColors.line),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x1237587C),
+                  blurRadius: 24,
+                  offset: Offset(0, 12),
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -770,15 +815,15 @@ class _SectionHeading extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: const Color(0xFF0F172A),
-                fontWeight: FontWeight.w800,
+                color: _FreshColors.ink,
+                fontWeight: FontWeight.w900,
               ),
         ),
         const SizedBox(height: 4),
         Text(
           description,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF475569),
+                color: _FreshColors.muted,
                 height: 1.4,
               ),
         ),
@@ -837,29 +882,36 @@ class _GeneratedResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: _FreshColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _FreshColors.line),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1237587C),
+            blurRadius: 24,
+            offset: Offset(0, 12),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(22),
               child: SizedBox(
-                width: 72,
-                height: 92,
+                width: 88,
+                height: 112,
                 child: Image.network(
                   result.url,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const ColoredBox(
-                      color: Color(0xFFE0F2FE),
+                      color: _FreshColors.paleBlue,
                       child: Icon(
                         Icons.portrait_outlined,
-                        color: Color(0xFF0369A1),
+                        color: _FreshColors.blue,
                       ),
                     );
                   },
@@ -874,15 +926,15 @@ class _GeneratedResultCard extends StatelessWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: const Color(0xFF0F172A),
-                          fontWeight: FontWeight.w800,
+                          color: _FreshColors.ink,
+                          fontWeight: FontWeight.w900,
                         ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     '선택된 얼굴 기준으로 생성된 증명사진 스타일 결과입니다.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF475569),
+                          color: _FreshColors.muted,
                           height: 1.4,
                         ),
                   ),
@@ -892,8 +944,8 @@ class _GeneratedResultCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF0369A1),
-                          fontWeight: FontWeight.w600,
+                          color: _FreshColors.blue,
+                          fontWeight: FontWeight.w700,
                         ),
                   ),
                 ],
@@ -912,10 +964,26 @@ class _ProgressPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: SizedBox(
-        width: 36,
-        height: 36,
-        child: CircularProgressIndicator(strokeWidth: 3),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: _FreshColors.surface,
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x1237587C),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(22),
+          child: SizedBox(
+            width: 36,
+            height: 36,
+            child: CircularProgressIndicator(strokeWidth: 3),
+          ),
+        ),
       ),
     );
   }
@@ -929,27 +997,34 @@ class _FailurePanel extends StatelessWidget {
     return Center(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          color: const Color(0xFFFFF8EC),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFF3D59B)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14A15C0A),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(22),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
                 Icons.image_not_supported_outlined,
-                color: Color(0xFFB45309),
-                size: 36,
+                color: _FreshColors.warning,
+                size: 38,
               ),
               const SizedBox(height: 10),
               Text(
                 '새 사진으로 다시 시도하세요',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: const Color(0xFF0F172A),
-                      fontWeight: FontWeight.w800,
+                      color: _FreshColors.ink,
+                      fontWeight: FontWeight.w900,
                     ),
               ),
               const SizedBox(height: 6),
@@ -957,7 +1032,7 @@ class _FailurePanel extends StatelessWidget {
                 '얼굴이 더 또렷한 사진으로 다시 시도해 주세요.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF475569),
+                      color: _FreshColors.muted,
                     ),
               ),
             ],
@@ -991,19 +1066,19 @@ class _SelectionSummary extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          color: _FreshColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: _FreshColors.line),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0A0F172A),
-              blurRadius: 14,
-              offset: Offset(0, -4),
+              color: Color(0x1437587C),
+              blurRadius: 24,
+              offset: Offset(0, -8),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -1011,7 +1086,7 @@ class _SelectionSummary extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.how_to_reg_outlined,
-                    color: Color(0xFF0369A1),
+                    color: _FreshColors.blue,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -1019,8 +1094,8 @@ class _SelectionSummary extends StatelessWidget {
                     child: Text(
                       '선택한 얼굴 $selectedCount명 / 전체 $totalCount명',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: const Color(0xFF0F172A),
-                            fontWeight: FontWeight.w800,
+                            color: _FreshColors.ink,
+                            fontWeight: FontWeight.w900,
                           ),
                     ),
                   ),

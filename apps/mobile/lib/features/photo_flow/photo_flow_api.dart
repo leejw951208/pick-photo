@@ -43,6 +43,8 @@ abstract class PhotoFlowApi {
     String uploadId,
     Set<String> faceIds,
   );
+
+  void close() {}
 }
 
 class NestPhotoFlowApi implements PhotoFlowApi {
@@ -52,13 +54,16 @@ class NestPhotoFlowApi implements PhotoFlowApi {
       defaultValue: 'http://localhost:3000',
     ),
     http.Client? client,
+    bool ownsClient = false,
   })  : _baseUrl = baseUrl.endsWith('/')
             ? baseUrl.substring(0, baseUrl.length - 1)
             : baseUrl,
-        _client = client ?? http.Client();
+        _client = client ?? http.Client(),
+        _ownsClient = client == null || ownsClient;
 
   final String _baseUrl;
   final http.Client _client;
+  final bool _ownsClient;
 
   @override
   Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
@@ -113,6 +118,7 @@ class NestPhotoFlowApi implements PhotoFlowApi {
       body: jsonEncode(_generationRequestBody(faceIds)),
     );
     final createBody = _decodeObject(createResponse);
+    _throwIfFailedStatus(createBody, 'Generation request failed.');
     final generationId = createBody['generationId'] as String?;
 
     if (generationId == null || generationId.isEmpty) {
@@ -125,11 +131,22 @@ class NestPhotoFlowApi implements PhotoFlowApi {
       _uri('/photos/generations/$generationId'),
     );
     final generationBody = _decodeObject(generationResponse);
+    _throwUnlessSucceededStatus(
+      generationBody,
+      'Generation did not complete successfully.',
+    );
 
     return (generationBody['results'] as List<dynamic>? ?? [])
         .whereType<Map<String, dynamic>>()
         .map(_generatedPhotoFromJson)
         .toList();
+  }
+
+  @override
+  void close() {
+    if (_ownsClient) {
+      _client.close();
+    }
   }
 
   Uri _uri(String path) => Uri.parse('$_baseUrl$path');
@@ -164,6 +181,18 @@ class NestPhotoFlowApi implements PhotoFlowApi {
     return body;
   }
 
+  void _throwIfFailedStatus(Map<String, dynamic> body, String message) {
+    if (body['status'] == 'failed') {
+      throw PhotoFlowApiException(message);
+    }
+  }
+
+  void _throwUnlessSucceededStatus(Map<String, dynamic> body, String message) {
+    if (body['status'] != 'succeeded') {
+      throw PhotoFlowApiException(message);
+    }
+  }
+
   DetectedFace _detectedFaceFromJson(Map<String, dynamic> json) {
     final box = json['box'] as Map<String, dynamic>;
 
@@ -189,7 +218,7 @@ class NestPhotoFlowApi implements PhotoFlowApi {
   }
 }
 
-class FakePhotoFlowApi implements PhotoFlowApi {
+class FakePhotoFlowApi extends PhotoFlowApi {
   @override
   Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
     if (photo.name.contains('no-face')) {

@@ -767,7 +767,7 @@ Uint8List onePixelPngBytes() {
   ]);
 }
 
-class FailingUploadPhotoFlowApi implements PhotoFlowApi {
+class FailingUploadPhotoFlowApi extends PhotoFlowApi {
   @override
   Future<FaceDetectionResult> uploadAndDetectFaces(LocalPhotoFile photo) async {
     throw StateError('upload failed');
@@ -782,7 +782,7 @@ class FailingUploadPhotoFlowApi implements PhotoFlowApi {
   }
 }
 
-class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
+class FailingGenerationPhotoFlowApi extends PhotoFlowApi {
   static const _faceBox = FaceBox(left: 0.1, top: 0.1, width: 0.8, height: 0.8);
 
   @override
@@ -809,7 +809,7 @@ class FailingGenerationPhotoFlowApi implements PhotoFlowApi {
   }
 }
 
-class MultiFacePhotoFlowApi implements PhotoFlowApi {
+class MultiFacePhotoFlowApi extends PhotoFlowApi {
   static const _faceOneBox =
       FaceBox(left: 0.05, top: 0.1, width: 0.25, height: 0.35);
   static const _faceTwoBox =
@@ -856,7 +856,7 @@ class MultiFacePhotoFlowApi implements PhotoFlowApi {
   }
 }
 
-class ManyFacePhotoFlowApi implements PhotoFlowApi {
+class ManyFacePhotoFlowApi extends PhotoFlowApi {
   ManyFacePhotoFlowApi({required this.faceCount});
 
   final int faceCount;
@@ -899,7 +899,7 @@ class ManyFacePhotoFlowApi implements PhotoFlowApi {
   }
 }
 
-class ControllablePhotoFlowApi implements PhotoFlowApi {
+class ControllablePhotoFlowApi extends PhotoFlowApi {
   final Map<String, Completer<FaceDetectionResult>> _uploadCompleters = {};
   final Map<String, Completer<List<GeneratedPhoto>>> _generationCompleters = {};
 

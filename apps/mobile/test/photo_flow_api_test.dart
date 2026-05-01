@@ -136,4 +136,89 @@ void main() {
 
     await api.generateForFaces('upload-1', {'face-1', 'face-2'});
   });
+
+  test('NestPhotoFlowApi throws when generation creation reports failed',
+      () async {
+    final api = NestPhotoFlowApi(
+      baseUrl: 'http://server.test',
+      client: MockClient((request) async {
+        if (request.url.path == '/photos/uploads/upload-1/generations') {
+          return http.Response(
+            '{"generationId":"generation-1","status":"failed"}',
+            201,
+          );
+        }
+
+        fail('Unexpected request: ${request.method} ${request.url}');
+      }),
+    );
+
+    expect(
+      () => api.generateForFaces('upload-1', {'face-1'}),
+      throwsA(isA<PhotoFlowApiException>()),
+    );
+  });
+
+  test('NestPhotoFlowApi throws when generation status reports failed',
+      () async {
+    final api = NestPhotoFlowApi(
+      baseUrl: 'http://server.test',
+      client: MockClient((request) async {
+        if (request.url.path == '/photos/uploads/upload-1/generations') {
+          return http.Response(
+            '{"generationId":"generation-1","status":"succeeded"}',
+            201,
+          );
+        }
+
+        if (request.url.path == '/photos/generations/generation-1') {
+          return http.Response(
+            '{"generationId":"generation-1","status":"failed","results":[]}',
+            200,
+          );
+        }
+
+        return http.Response('not found', 404);
+      }),
+    );
+
+    expect(
+      () => api.generateForFaces('upload-1', {'face-1'}),
+      throwsA(isA<PhotoFlowApiException>()),
+    );
+  });
+
+  test('NestPhotoFlowApi only closes injected clients when it owns them', () {
+    final externalClient = CloseTrackingClient();
+    final borrowedApi = NestPhotoFlowApi(client: externalClient);
+
+    borrowedApi.close();
+
+    expect(externalClient.closed, isFalse);
+
+    final ownedClient = CloseTrackingClient();
+    final ownedApi = NestPhotoFlowApi(
+      client: ownedClient,
+      ownsClient: true,
+    );
+
+    ownedApi.close();
+
+    expect(ownedClient.closed, isTrue);
+  });
+}
+
+class CloseTrackingClient extends http.BaseClient {
+  bool closed = false;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  void close() {
+    closed = true;
+    super.close();
+  }
 }
